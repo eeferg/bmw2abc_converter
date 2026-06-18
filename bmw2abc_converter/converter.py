@@ -10,42 +10,67 @@ from pathlib import Path
 
 from .grace_notes import DECO, GRACE
 
-# Regex for a note token: optional high/low prefix is already stripped before matching.
 _NOTE_RE = re.compile(r"([ABCDEFG])([rl]?)_(\d+)")
-# Regex for an accidental token preceding a note.
 _ACC_RE = re.compile(r"(sharp|flat|natural)(.*)")
-# Regex for a time-signature token (used inline in music).
 _TIMESIG_RE = re.compile(r"\d+_\d+")
-# Regex for dotted-note marker: one or two apostrophes then a letter a-h or l.
+# Dot marker: one or two apostrophes then a letter (a-h or l).
+# Use match() not fullmatch() — the original JS uses .test() which is a partial
+# match, allowing 'la' and 'ha' (two-char note names) to be detected via 'l/'h'.
 _DOT_RE = re.compile(r"'{1,2}[abcdefghl]")
+
+# BWW visual-spacing tokens with no musical meaning.
+_SKIP_TOKENS = frozenset({"space"})
+
+# Accidentals already implied by K:Hp / K:HP — no need to emit them explicitly.
+_STANDARD_ACC = frozenset({"^f", "^c"})
+
+
+def _parse_accidental_note(note_suffix: str) -> str:
+    return {"hg": "g", "ha": "a", "lg": "G", "la": "A"}.get(note_suffix, note_suffix)
 
 
 def _abc_duration(denom: int, dot: str | None) -> str:
-    """Return ABC duration string for a given BWW denominator and optional dot marker."""
+    """Return ABC duration modifier for a BWW denominator and optional dot token."""
     if dot is None:
         return {1: "8", 2: "4", 4: "2", 8: "", 16: "/", 32: "//"}.get(denom, "")
     double_dot = len(dot) >= 2 and dot[1] == "'"
     if double_dot:
         return {1: "14", 2: "7", 4: "7/", 8: "7//", 16: "7///", 32: "7////",}.get(denom, "")
-    else:
-        return {1: "12", 2: "6", 4: "3", 8: "3/", 16: "3//", 32: "3///",}.get(denom, "")
+    return {1: "12", 2: "6", 4: "3", 8: "3/", 16: "3//", 32: "3///",}.get(denom, "")
 
 
-def _parse_accidental_note(note_suffix: str) -> str:
-    """Convert BWW note suffix (hg/ha/lg/la/a-g) to ABC pitch letter."""
-    mapping = {"hg": "g", "ha": "a", "lg": "G", "la": "A"}
-    return mapping.get(note_suffix, note_suffix)
+def _parse_clef_line(line: str) -> tuple[str | None, list[str]]:
+    """Parse a '&' clef line.
+
+    Returns (time_sig or None, list of music tokens).
+    Accidentals are not returned here; the header parser extracts them separately.
+    """
+    time_sig = None
+    music_tokens = []
+    for tok in line.strip().split():
+        if tok == "&":
+            continue
+        if _ACC_RE.fullmatch(tok):
+            continue
+        if re.fullmatch(r"C|C_|\d+_\d+", tok) and time_sig is None:
+            time_sig = tok
+            continue
+        music_tokens.append(tok)
+    return time_sig, music_tokens
 
 
-def convert(bww_text: str, filename: str = "input.bww") -> str:
-    """Convert the text of a BWW file to ABC notation."""
+def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP") -> str:
+    """Convert the text of a BWW file to ABC notation.
+
+    key_type: "HP" (default, no key sig on staff) or "Hp" (shows F#/C# on staff).
+    """
     lines = bww_text.splitlines()
     out: list[str] = []
-
     out.append(f"%abc-2.2\n% Converted from {filename} to ABC by bmw2abc_converter\n\nX:1")
 
     key_acc = ""
     i = 0
+    pending_music_tokens: list[str] = []
 
     # --- Header ---
     while i < len(lines):
@@ -64,7 +89,6 @@ def convert(bww_text: str, filename: str = "input.bww") -> str:
             text = l[1:j]
             if not text:
                 continue
-            # character after closing quote + comma determines type
             if len(l) <= j + 2 or l[j + 1] != ",":
                 out.append("% " + text)
                 continue
@@ -86,39 +110,46 @@ def convert(bww_text: str, filename: str = "input.bww") -> str:
             continue
 
         if first == "&":
-            # parse accidentals and time signature from the clef line
-            tokens = l.split()
-            for tok in tokens:
-                m = _ACC_RE.fullmatch(tok)
-                if not m:
+            # Single pass: collect accidentals, time sig, and any trailing music tokens.
+            time_sig = None
+            for tok in l.split():
+                if tok == "&":
                     continue
-                acc_type, acc_note = m.group(1), m.group(2)
-                sep = " " if key_acc else ""
-                prefix = {"sharp": "^", "flat": "_", "natural": "="}.get(acc_type, "")
-                key_acc += sep + prefix + _parse_accidental_note(acc_note)
+                acc_m = _ACC_RE.fullmatch(tok)
+                if acc_m:
+                    acc_type, acc_note = acc_m.group(1), acc_m.group(2)
+                    sep = " " if key_acc else ""
+                    prefix = {"sharp": "^", "flat": "_", "natural": "="}.get(acc_type, "")
+                    key_acc += sep + prefix + _parse_accidental_note(acc_note)
+                    continue
+                if re.fullmatch(r"C|C_|\d+_\d+", tok) and time_sig is None:
+                    time_sig = tok
+                    continue
+                pending_music_tokens.append(tok)
 
-            # time signature is the last token on the & line
-            last = tokens[-1]
-            if not re.match(r"C$|C_$|\d+_\d+", last):
-                # look on the next line
+            if time_sig is None:
+                # look on the next line for the time signature
                 if i < len(lines):
-                    next_tokens = lines[i].strip().split()
-                    i += 1
-                    last = next_tokens[0] if next_tokens else ""
-                if not re.match(r"C$|C_$|\d+_\d+", last):
-                    out.append("M:2/4")
-                    break
+                    next_ts, next_music = _parse_clef_line(lines[i].strip())
+                    if next_ts:
+                        i += 1
+                        time_sig = next_ts
+                        pending_music_tokens = pending_music_tokens + next_music
 
-            if last == "C_":
+            if time_sig == "C_":
                 out.append("M:C|")
+            elif time_sig:
+                out.append("M:" + time_sig.replace("_", "/"))
             else:
-                out.append("M:" + last.replace("_", "/"))
-            break  # clef line consumed; music starts from current i
-
-        # ignore unrecognised header lines (MIDINoteMappings, etc.)
+                out.append("M:2/4")
+            break
 
     out.append("L:1/8")
-    out.append("K:Hp exp " + key_acc)
+    extra_acc = [a for a in key_acc.split() if a not in _STANDARD_ACC]
+    key_line = f"K:{key_type}"
+    if extra_acc:
+        key_line += " exp " + " ".join(extra_acc)
+    out.append(key_line)
 
     # --- Music ---
     measure = ""
@@ -127,19 +158,15 @@ def convert(bww_text: str, filename: str = "input.bww") -> str:
     beam = False
     fermata = False
 
-    while i < len(lines):
-        raw = lines[i]
-        i += 1
-        if not raw or raw[0] == "&":
-            continue
+    def process_tokens(tokens: list[str]) -> None:
+        nonlocal measure, tie, pending_acc, beam, fermata
 
-        tokens = raw.strip().split()
         k = 0
         while k < len(tokens):
             t = tokens[k]
             k += 1
 
-            if not t:
+            if not t or t in _SKIP_TOKENS:
                 continue
 
             # --- Structural / barline tokens ---
@@ -185,7 +212,6 @@ def convert(bww_text: str, filename: str = "input.bww") -> str:
                 continue
 
             if t[0] == "'" and len(t) > 1 and t[1].isdigit():
-                # repeat volta bracket: '1, '2, '12, '123
                 measure += "["
                 bracket = t[1:]
                 if len(bracket) == 1:
@@ -210,8 +236,12 @@ def convert(bww_text: str, filename: str = "input.bww") -> str:
                 ch = t[1] if len(t) > 1 else ""
                 if ch == "t":
                     if len(t) > 2 and t[2] == "s":
+                        # New format: tie starts here; output '-' after the next note.
                         tie = True
-                    if len(t) > 2 and t[2] != "e":
+                    elif len(t) > 2 and t[2] == "e":
+                        pass  # new format end: nothing to do
+                    else:
+                        # Old format bare ^t: output '-' immediately.
                         measure += "-"
                 elif ch in "23":
                     if len(t) <= 2 or t[2] != "e":
@@ -261,20 +291,19 @@ def convert(bww_text: str, filename: str = "input.bww") -> str:
                     measure += pending_acc
                     pending_acc = ""
 
-                # fermata: next token contains "fermat"
                 if k < len(tokens) and "fermat" in tokens[k]:
                     fermata = True
                     measure += "H"
 
-                # B is always low (Low-B is the only B on the bagpipe)
                 if letter == "B":
                     low = True
 
                 measure += letter if low else letter.lower()
 
-                # dotted note: consume next token if it is a dot marker
+                # dotted note: _DOT_RE.match (partial) mirrors JS .test() behaviour,
+                # allowing two-char note names like 'la and 'ha to be detected.
                 dot_token = None
-                if k < len(tokens) and _DOT_RE.fullmatch(tokens[k]):
+                if k < len(tokens) and _DOT_RE.match(tokens[k]):
                     dot_token = tokens[k]
                     k += 1
 
@@ -284,7 +313,6 @@ def convert(bww_text: str, filename: str = "input.bww") -> str:
                     measure += "-"
                     tie = False
 
-                # beaming: eighth notes and shorter use r/l to group
                 if denom >= 8:
                     if beam_dir == "l":
                         beam = False
@@ -294,7 +322,7 @@ def convert(bww_text: str, filename: str = "input.bww") -> str:
                         measure += " "
 
                 if fermata:
-                    k += 1  # consume the fermat token
+                    k += 1
                     fermata = False
 
                 continue
@@ -319,14 +347,45 @@ def convert(bww_text: str, filename: str = "input.bww") -> str:
 
             print(f"*** {t!r} not recognised ***", file=sys.stderr)
 
+    # Process any music tokens found on the initial & line (e.g. I!'')
+    if pending_music_tokens:
+        process_tokens(pending_music_tokens)
+
+    # Process music lines
+    while i < len(lines):
+        raw = lines[i]
+        i += 1
+        stripped = raw.strip()
+
+        if not stripped:
+            continue
+
+        # Section label lines: "2nd Part", "3rd Part", etc.
+        if stripped.startswith('"'):
+            end = stripped.rfind('"')
+            label = stripped[1:end].strip() if end > 0 else stripped[1:]
+            if label:
+                out.append("% " + label)
+            continue
+
+        # Subsequent & lines: strip the clef/accidental/timesig tokens,
+        # then process any remaining music tokens (e.g. I!'').
+        if stripped.startswith("&"):
+            _, music_toks = _parse_clef_line(stripped)
+            if music_toks:
+                process_tokens(music_toks)
+            continue
+
+        process_tokens(stripped.split())
+
     if measure.strip():
         out.append(measure)
 
     return "\n".join(out) + "\n"
 
 
-def convert_file(path: str | Path) -> str:
+def convert_file(path: str | Path, key_type: str = "HP") -> str:
     """Read a BWW file and return ABC notation as a string."""
     path = Path(path)
     text = path.read_text(encoding="utf-8", errors="replace")
-    return convert(text, filename=path.name)
+    return convert(text, filename=path.name, key_type=key_type)

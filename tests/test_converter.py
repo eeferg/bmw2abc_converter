@@ -47,11 +47,30 @@ def test_time_signature():
     assert "M:3/4" in abc
 
 
-def test_key_signature():
+def test_key_signature_default_hp():
+    # Default: K:HP — standard F#/C# accidentals are not emitted explicitly.
     abc = convert(AMAZING_GRACE_BWW, "amazing_grace.bww")
-    assert "K:Hp exp" in abc
-    assert "^f" in abc
-    assert "^c" in abc
+    assert "K:HP" in abc
+    assert "exp" not in abc
+
+
+def test_key_signature_hp_flag():
+    # --hp flag: K:Hp — standard accidentals still not repeated as exp.
+    abc = convert(AMAZING_GRACE_BWW, "amazing_grace.bww", key_type="Hp")
+    assert "K:Hp" in abc
+    assert "exp" not in abc
+
+
+def test_key_signature_non_standard_acc():
+    # Non-standard accidental (e.g. naturalc) should appear as exp.
+    bww = """\
+& sharpf sharpc naturalc 3_4
+LA_4
+!t
+"""
+    abc = convert(bww)
+    assert "exp" in abc
+    assert "=c" in abc
 
 
 def test_barlines():
