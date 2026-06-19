@@ -17,6 +17,16 @@ _TIMESIG_RE = re.compile(r"\d+_\d+")
 # Use match() not fullmatch() — the original JS uses .test() which is a partial
 # match, allowing 'la' and 'ha' (two-char note names) to be detected via 'l/'h'.
 _DOT_RE = re.compile(r"'{1,2}[abcdefghl]")
+# Dotted-rhythm shorthands (fraction pairs, always applied):
+#   A3/{grace}c/ → A>{grace}c   (dotted-16th + 32nd at L:1/8, dotted-32nd + 64th at L:1/16)
+#   A/{grace}c3/ → A<{grace}c
+_DOTTED_GT_RE = re.compile(r"([A-Ga-g])3\/ ?((?:\{[^}]*\})?)([A-Ga-g])\/(?!\/)")
+_DOTTED_LT_RE = re.compile(r"([A-Ga-g])\/(?!\/) ?((?:\{[^}]*\})?)([A-Ga-g])3\/")
+# Integer dotted pairs (only applied at L:1/16):
+#   A3{grace}c → A2>{grace}c2  (dotted-8th + 16th)
+#   A{grace}c3 → A2<{grace}c2  (16th + dotted-8th)
+_DOTTED_GT2_RE = re.compile(r"([A-Ga-g])3 ?((?:\{[^}]*\})?)([A-Ga-g])(?![/\d])")
+_DOTTED_LT2_RE = re.compile(r"([A-Ga-g])((?:\{[^}]*\})?)([A-Ga-g])3(?![/\d])")
 
 # BWW visual-spacing tokens with no musical meaning.
 _SKIP_TOKENS = frozenset({"space"})
@@ -29,14 +39,26 @@ def _parse_accidental_note(note_suffix: str) -> str:
     return {"hg": "g", "ha": "a", "lg": "G", "la": "A"}.get(note_suffix, note_suffix)
 
 
-def _abc_duration(denom: int, dot: str | None) -> str:
+_DUR_PLAIN = {
+    8:  {1: "8",  2: "4",  4: "2",  8: "",   16: "/",   32: "//"},
+    16: {1: "16", 2: "8",  4: "4",  8: "2",  16: "",    32: "/"},
+}
+_DUR_DOT = {
+    8:  {1: "12", 2: "6",  4: "3",  8: "3/", 16: "3//", 32: "3///"},
+    16: {1: "24", 2: "12", 4: "6",  8: "3",  16: "3/",  32: "3//"},
+}
+_DUR_DDOT = {
+    8:  {1: "14", 2: "7",  4: "7/", 8: "7//",  16: "7///",  32: "7////"},
+    16: {1: "28", 2: "14", 4: "7",  8: "7/",   16: "7//",   32: "7///"},
+}
+
+
+def _abc_duration(denom: int, dot: str | None, unit: int = 8) -> str:
     """Return ABC duration modifier for a BWW denominator and optional dot token."""
     if dot is None:
-        return {1: "8", 2: "4", 4: "2", 8: "", 16: "/", 32: "//"}.get(denom, "")
+        return _DUR_PLAIN[unit].get(denom, "")
     double_dot = len(dot) >= 2 and dot[1] == "'"
-    if double_dot:
-        return {1: "14", 2: "7", 4: "7/", 8: "7//", 16: "7///", 32: "7////",}.get(denom, "")
-    return {1: "12", 2: "6", 4: "3", 8: "3/", 16: "3//", 32: "3///",}.get(denom, "")
+    return (_DUR_DDOT if double_dot else _DUR_DOT)[unit].get(denom, "")
 
 
 def _parse_clef_line(line: str) -> tuple[str | None, list[str]]:
@@ -59,10 +81,11 @@ def _parse_clef_line(line: str) -> tuple[str | None, list[str]]:
     return time_sig, music_tokens
 
 
-def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP") -> str:
+def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", unit: int = 8) -> str:
     """Convert the text of a BWW file to ABC notation.
 
     key_type: "HP" (default, no key sig on staff) or "Hp" (shows F#/C# on staff).
+    unit: unit note length denominator — 8 for L:1/8 (default), 16 for L:1/16.
     """
     lines = bww_text.splitlines()
     out: list[str] = []
@@ -144,7 +167,7 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP") ->
                 out.append("M:2/4")
             break
 
-    out.append("L:1/8")
+    out.append(f"L:1/{unit}")
     extra_acc = [a for a in key_acc.split() if a not in _STANDARD_ACC]
     key_line = f"K:{key_type}"
     if extra_acc:
@@ -176,7 +199,7 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP") ->
                 measure = ""
                 continue
 
-            if t == "_":
+            if t in ("_", "_'"):
                 measure += "]"
                 continue
 
@@ -227,7 +250,7 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP") ->
             if t.startswith("REST_"):
                 denom_str = t[5:]
                 denom = int(denom_str) if denom_str.isdigit() else 8
-                measure += "z" + _abc_duration(denom, None)
+                measure += "z" + _abc_duration(denom, None, unit)
                 continue
 
             # --- Tuplets ---
@@ -307,7 +330,7 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP") ->
                     dot_token = tokens[k]
                     k += 1
 
-                measure += _abc_duration(denom, dot_token)
+                measure += _abc_duration(denom, dot_token, unit)
 
                 if tie:
                     measure += "-"
@@ -381,11 +404,17 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP") ->
     if measure.strip():
         out.append(measure)
 
-    return "\n".join(out) + "\n"
+    result = "\n".join(out) + "\n"
+    result = _DOTTED_GT_RE.sub(r"\1>\2\3", result)
+    result = _DOTTED_LT_RE.sub(r"\1<\2\3", result)
+    if unit == 16:
+        result = _DOTTED_GT2_RE.sub(r"\g<1>2>\g<2>\g<3>2", result)
+        result = _DOTTED_LT2_RE.sub(r"\g<1>2<\g<2>\g<3>2", result)
+    return result
 
 
-def convert_file(path: str | Path, key_type: str = "HP") -> str:
+def convert_file(path: str | Path, key_type: str = "HP", unit: int = 8) -> str:
     """Read a BWW file and return ABC notation as a string."""
     path = Path(path)
     text = path.read_text(encoding="utf-8", errors="replace")
-    return convert(text, filename=path.name, key_type=key_type)
+    return convert(text, filename=path.name, key_type=key_type, unit=unit)

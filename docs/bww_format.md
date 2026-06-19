@@ -207,6 +207,7 @@ Appear as a separate token *before* the note:
 | `'12` | "1 of 2" | `["1 of 2"` |
 | `'123` | "1 of 2 & 3" | `["1 of 2 & 3"` |
 | `_` | Close bracket | `]` |
+| `_'` | Close volta bracket | `]` |
 | `'intro` | Introduction | `["Introduction"` |
 
 ---

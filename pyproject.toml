@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
-bmw2abc = "main:main"
+bmw2abc = "bmw2abc_converter:main"
 
 [build-system]
 requires = ["hatchling"]

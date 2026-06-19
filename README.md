@@ -10,6 +10,32 @@ Python port of [bww2abc.js](http://moinejf.free.fr/bww2abc) by Jean-Francois Moi
 
 Requires Python 3.12+. Uses [uv](https://docs.astral.sh/uv/) for dependency management.
 
+### As an installable command (recommended)
+
+Install once and run `bmw2abc` from anywhere:
+
+```bash
+git clone https://github.com/eeferg/bmw2abc_converter
+cd bmw2abc_converter
+uv tool install .
+```
+
+After that, `bmw2abc` is available system-wide:
+
+```bash
+bmw2abc tune.bww
+bmw2abc tune.bww -o tune.abc
+bmw2abc tune.bww --hp
+```
+
+To update after pulling new changes:
+
+```bash
+uv tool install . --reinstall
+```
+
+### Run without installing
+
 ```bash
 git clone https://github.com/eeferg/bmw2abc_converter
 cd bmw2abc_converter
@@ -22,17 +48,22 @@ uv sync
 
 ```bash
 # File to stdout
-uv run python main.py tune.bww
+bmw2abc tune.bww
 
 # File to file
-uv run python main.py tune.bww -o tune.abc
+bmw2abc tune.bww -o tune.abc
 
 # From stdin
-cat tune.bww | uv run python main.py
+cat tune.bww | bmw2abc
 
 # Use K:Hp key signature (shows F#/C# on staff) instead of default K:HP
-uv run python main.py tune.bww --hp
+bmw2abc tune.bww --hp
+
+# Use L:1/16 unit note length (suits marches with 32nd-note detail)
+bmw2abc tune.bww --unit 1/16
 ```
+
+If running without installing, prefix commands with `uv run python main.py` instead of `bmw2abc`.
 
 ### Key signature options
 
@@ -42,6 +73,15 @@ uv run python main.py tune.bww --hp
 | `--hp` | `K:Hp` | F# and C# shown on staff |
 
 Non-standard accidentals (e.g. a naturalised High-G) are always emitted as `exp` modifiers regardless of flag.
+
+### Unit note length
+
+| Flag | ABC output | Best for |
+|------|-----------|---------|
+| *(default)* | `L:1/8` | Reels, jigs, strathspeys — 8th note as unit |
+| `--unit 1/16` | `L:1/16` | Marches and slow airs with 32nd-note detail |
+
+At `L:1/16`, dotted rhythms are written with `>` and `<` shorthands (`A>B`, `A<B`) rather than explicit fraction multipliers, which produces cleaner, more readable notation.
 
 ---
 
@@ -74,10 +114,10 @@ Grace notes appear in `{}` immediately before their principal note. Each barline
 | Tempo (`TuneTempo,90`) | `Q:1/4=90` |
 | Time signature | `M:3/4` etc. |
 | Notes with H/L prefix (High-G, Low-A…) | `g` `A` etc. |
-| Dotted notes (`'la`, `''f`) | duration multipliers (`A3/`, `f7//`) |
+| Dotted notes (`'la`, `''f`) | `>` / `<` shorthands or duration multipliers (`A3/`, `f7//`) |
 | Grace note embellishments | `{gAd}` etc. — full table in `docs/bww_format.md` |
 | Repeat barlines | `|:` `:|` |
-| First/second endings | `[1` `[2` `["1 of 2"` |
+| First/second endings (`'1`, `'2`, `_'`) | `[1` `[2` `["1 of 2"` `]` |
 | Ties (`^ts` / `^te`) | `-` after first note |
 | Rests (`REST_4`) | `z2` |
 | Tuplets (`^3s`) | `(3` |
