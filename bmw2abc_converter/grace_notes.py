@@ -58,7 +58,7 @@ GRACE: dict[str, str] = {
     "gstb": "gBG",
     "gstc": "gcG",
     "gstd": "gdG",
-    "lgstd": "gec",
+    "lgstd": "gdc",
     "gste": "geA",
     "gstf": "gfe",
 
