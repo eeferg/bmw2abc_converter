@@ -22,16 +22,23 @@ def main() -> None:
         default="1/8",
         help="Unit note length: 1/8 (default) or 1/16",
     )
+    parser.add_argument(
+        "--swap-title-type",
+        action="store_true",
+        help="swap title and tune type (bagpipemusic.com / Lee & Sons files store them reversed)",
+    )
     args = parser.parse_args()
 
     key_type = "Hp" if args.hp else "HP"
     unit = 16 if args.unit == "1/16" else 8
 
     if args.input:
-        abc = convert_file(args.input, key_type=key_type, unit=unit)
+        abc = convert_file(args.input, key_type=key_type, unit=unit,
+                           swap_title_type=args.swap_title_type)
     else:
         bww_text = sys.stdin.read()
-        abc = convert(bww_text, filename="stdin", key_type=key_type, unit=unit)
+        abc = convert(bww_text, filename="stdin", key_type=key_type, unit=unit,
+                      swap_title_type=args.swap_title_type)
 
     if args.output:
         Path(args.output).write_text(abc, encoding="utf-8")

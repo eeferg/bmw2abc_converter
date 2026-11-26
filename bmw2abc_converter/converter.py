@@ -81,11 +81,14 @@ def _parse_clef_line(line: str) -> tuple[str | None, list[str]]:
     return time_sig, music_tokens
 
 
-def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", unit: int = 8) -> str:
+def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", unit: int = 8,
+            swap_title_type: bool = False) -> str:
     """Convert the text of a BWW file to ABC notation.
 
     key_type: "HP" (default, no key sig on staff) or "Hp" (shows F#/C# on staff).
     unit: unit note length denominator — 8 for L:1/8 (default), 16 for L:1/16.
+    swap_title_type: treat the BWW T field as tune type and Y as title, for
+        bagpipemusic.com (Lee & Sons) files which store them the wrong way round.
     """
     lines = bww_text.splitlines()
     out: list[str] = []
@@ -116,7 +119,14 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
                 out.append("% " + text)
                 continue
             kind = l[j + 3] if len(l) > j + 3 else ""
+            if swap_title_type and kind in ("T", "Y"):
+                kind = "Y" if kind == "T" else "T"
             if kind == "T":
+                # keep T: ahead of R: even when the type line came first
+                r_at = next((n for n, o in enumerate(out) if o.startswith("R:")), None)
+                if r_at is not None:
+                    out.insert(r_at, "T:" + text)
+                    continue
                 out.append("T:" + text)
             elif kind == "M":
                 out.append("C:" + text)
@@ -413,8 +423,10 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
     return result
 
 
-def convert_file(path: str | Path, key_type: str = "HP", unit: int = 8) -> str:
+def convert_file(path: str | Path, key_type: str = "HP", unit: int = 8,
+                 swap_title_type: bool = False) -> str:
     """Read a BWW file and return ABC notation as a string."""
     path = Path(path)
     text = path.read_text(encoding="utf-8", errors="replace")
-    return convert(text, filename=path.name, key_type=key_type, unit=unit)
+    return convert(text, filename=path.name, key_type=key_type, unit=unit,
+                   swap_title_type=swap_title_type)

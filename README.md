@@ -65,6 +65,9 @@ bmw2abc tune.bww --hp
 
 # Use L:1/16 unit note length (suits marches with 32nd-note detail)
 bmw2abc tune.bww --unit 1/16
+
+# bagpipemusic.com (Lee & Sons) files: put the title and tune type the right way round
+bmw2abc tune.bww --swap-title-type
 ```
 
 If running without installing, prefix commands with `uv run python main.py` instead of `bmw2abc`.
@@ -180,7 +183,7 @@ uv run pytest tests/ -v
 - Piobaireacd ornaments (not present in standard march/strathspey/reel repertoire) are not mapped
 - Multi-staff scores (e.g. harmonised pipe band scores) are not supported
 - bagpipemusic.com (Lee & Sons) BWW files store the tune type in the title field
-  and vice versa, so `bmw2abc` output for them has `T:` and `R:` swapped
+  and vice versa; use `bmw2abc --swap-title-type` for those files
 
 ---
 
