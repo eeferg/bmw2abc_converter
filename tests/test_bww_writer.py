@@ -47,7 +47,8 @@ def test_tie_and_triplet():
 
 def test_endings():
     m = music("|1 B8 :|2 c8 |]\n", HDR8)
-    assert m[4:] == ["'1", "B_1", "_'", "!", "'2", "C_1", "_'", "!I"]
+    # Lee writes the repeat before a 2nd ending ('_' ''!I' 17x vs '_' !' once)
+    assert m[4:] == ["'1", "B_1", "_'", "''!I", "'2", "C_1", "_'", "!I"]
 
 
 def test_explicit_ending_close_and_n_of_m():
@@ -116,7 +117,7 @@ def test_ending_started_at_line_end_moves_to_next_staff():
     t = parse_abc(HDR8 + "|1 A4 :|2\nB4 |]\n")[0]
     out = write_bww(t)
     assert out[out.index("&"):].split() == [
-        "&", "sharpf", "sharpc", "2_4", "'1", "LA_2", "_'", "!t",
+        "&", "sharpf", "sharpc", "2_4", "'1", "LA_2", "_'", "''!I",
         "&", "sharpf", "sharpc", "'2", "B_2", "_'", "!I"]
     assert not any("mid-bar" in w for w in t.warnings)
 
@@ -126,3 +127,14 @@ def test_staff_with_no_notes_is_skipped():
     out = write_bww(t)
     assert out.count("& sharpf sharpc") == 1
     assert any("no notes" in w for w in t.warnings)
+
+
+def test_repeat_before_second_ending_kept_across_lines():
+    m = music("|1 A4 :|\n[2 B4 |]\n", HDR8)
+    assert m == ["&", "sharpf", "sharpc", "2_4", "'1", "LA_2", "_'", "''!I",
+                 "&", "sharpf", "sharpc", "'2", "B_2", "_'", "!I"]
+
+
+def test_body_meter_line_kept():
+    m = music("A2 B2 |\nM:3/4\nA2 B2 c2 |]\n", HDR8)
+    assert m[6:] == ["!t", "&", "sharpf", "sharpc", "3_4", "LA_4", "B_4", "C_4", "!I"]

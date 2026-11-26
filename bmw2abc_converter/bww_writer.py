@@ -157,7 +157,6 @@ class _StaffWriter:
         terminated = False
 
         for i, item in enumerate(items):
-            following = items[i + 1] if i + 1 < len(items) else next_item
             if isinstance(item, Note):
                 cur += self._note_tokens(item, suffix.get(i, ""), staff_no)
             elif isinstance(item, Rest):
@@ -187,7 +186,6 @@ class _StaffWriter:
                         self.ending_open and at_end):
                     cur.append("_'")
                     self.ending_open = False
-                into_ending = isinstance(following, Ending)
                 if at_start:
                     if kind in ("|:", "::"):
                         cur.append("I!''")
@@ -195,9 +193,7 @@ class _StaffWriter:
                         cur.append("I!")
                 elif at_end:
                     terminated = True
-                    if kind == ":|" and into_ending:
-                        cur.append("!t")
-                    elif kind in (":|", "::"):
+                    if kind in (":|", "::"):
                         cur.append("''!I")
                         if kind == "::":
                             self.carry_repeat_start = True
@@ -211,11 +207,8 @@ class _StaffWriter:
                     else:
                         cur.append("!t")
                 else:
-                    if kind == ":|" and into_ending:
-                        tok = "!"
-                    else:
-                        tok = {"|": "!", ":|": "''!I", "|:": "I!''", "::": "''!I I!''",
-                               "|]": "!I", "[|": "I!", "||": "I!"}[kind]
+                    tok = {"|": "!", ":|": "''!I", "|:": "I!''", "::": "''!I I!''",
+                           "|]": "!I", "[|": "I!", "||": "I!"}[kind]
                     if tok == "!":
                         cur = ["!"]
                         physical.append(cur)

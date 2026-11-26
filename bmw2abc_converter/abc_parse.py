@@ -86,6 +86,7 @@ class _TuneParser:
         self.voice: str | None = None
         self.dropped_voices: set[str] = set()
         self.pending_label: str | None = None
+        self.pending_items: list = []  # e.g. Meter from a body M: line
         self.chords = 0
         self.slurs = 0
         self.slash_rests = 0
@@ -139,7 +140,8 @@ class _TuneParser:
 
     # -- music ------------------------------------------------------------
     def music_line(self, text: str, lineno: int) -> None:
-        items: list = []
+        items: list = self.pending_items
+        self.pending_items = []
         # beam_start: whitespace/bar/line start since the last note
         separated = True
         pos = 0
@@ -259,7 +261,8 @@ class _TuneParser:
                 self.pending_label = m.group(1)
             return
         if m := _FIELD_RE.match(line):
-            self.field(m.group(1), m.group(2))
+            if self.voice_kept() or m.group(1) == "V":
+                self.pending_items += self.field(m.group(1), m.group(2))
             return
         if not self.in_body:
             return
@@ -270,6 +273,8 @@ class _TuneParser:
         self.music_line(line, lineno)
 
     def finish(self) -> Tune:
+        if not self.in_body:
+            self.warn("no K: field, so no music was read")
         if self.chords:
             self.warn(f"dropped {self.chords} chord symbol(s)/annotation(s)")
         if self.slurs:

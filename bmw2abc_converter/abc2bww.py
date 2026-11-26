@@ -119,6 +119,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.out is None:
             print("--all needs -o OUTPUT_FOLDER", file=sys.stderr)
             return 2
+        if not args.all.is_dir():
+            print(f"--all: {args.all} is not a folder", file=sys.stderr)
+            return 2
         jobs = [(abc, args.out / rel) for abc, rel in _collect_all(args.all)]
     out_dir = args.out if args.out is not None else Path.cwd()
     jobs += [(f, out_dir) for f in args.files]

@@ -90,3 +90,8 @@ def test_warnings_printed(tmp_path, capsys):
     src = write(tmp_path / "tune.abc", TUNE.replace("A2 B2", '"Bm"A2 B2'))
     main([str(src), "-o", str(tmp_path)])
     assert "chord" in capsys.readouterr().err
+
+
+def test_all_missing_folder_is_an_error(tmp_path, capsys):
+    assert main(["--all", str(tmp_path / "nope"), "-o", str(tmp_path / "o")]) == 2
+    assert "not a folder" in capsys.readouterr().err

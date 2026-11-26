@@ -117,3 +117,8 @@ def test_line_continuation_joins_lines():
 
 def test_consecutive_grace_groups_combine():
     assert notes(parse_abc(HDR + "{g}{d}{f}e2|\n")[0])[0].grace == "gdf"
+
+
+def test_missing_key_field_warns():
+    t = parse_abc("X:1\nT:No key\nM:2/4\nL:1/8\nA2 B2|\n")[0]
+    assert any("K:" in w for w in t.warnings)
