@@ -1,13 +1,14 @@
 [project]
 name = "bmw2abc-converter"
 version = "0.1.0"
-description = "Convert Bagpipe Music Writer (.bww/.bmw) files to ABC music notation"
+description = "Convert between Bagpipe Music Writer (.bww/.bmw) files and ABC music notation"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
 bmw2abc = "bmw2abc_converter:main"
+abc2bww = "bmw2abc_converter.abc2bww:main"
 
 [build-system]
 requires = ["hatchling"]

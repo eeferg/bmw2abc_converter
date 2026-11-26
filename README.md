@@ -1,6 +1,10 @@
 # bmw2abc_converter
 
-Convert Bagpipe Music Writer (`.bww` / `.bmw`) files to ABC music notation.
+Convert Bagpipe Music Writer (`.bww` / `.bmw`) files to ABC music notation — and back.
+
+- `bmw2abc` — BWW → ABC
+- `abc2bww` — ABC → BWW (Bagpipe Music Writer Gold), for importing ABC tunes into
+  apps such as Braw Tunes that read BWW but not ABC
 
 Python port of [bww2abc.js](http://moinejf.free.fr/bww2abc) by Jean-Francois Moine (GPL3+).
 
@@ -85,6 +89,30 @@ At `L:1/16`, dotted rhythms are written with `>` and `<` shorthands (`A>B`, `A<B
 
 ---
 
+## ABC → BWW (`abc2bww`)
+
+Converts pipe-tune ABC (the style written for abcm2ps with `K:HP`) to BWW files
+that open in Bagpipe Music Writer Gold.
+
+```bash
+abc2bww tune.abc                      # → ./tune.bww
+abc2bww a.abc b.abc c.abc             # several at once, into the current folder
+abc2bww pipe_march/*.abc -o ~/bww/    # choose the output folder
+abc2bww tune.abc --stdout             # print instead of writing
+abc2bww tune.abc --force              # overwrite an existing .bww
+abc2bww --all tunes/ -o bww_out/      # every ABC file in tunes/pipe_* folders
+```
+
+- A file with several `X:` tunes gives `name001.bww`, `name002.bww`, … (one
+  arrangement per file, as Braw Tunes requires), numbered like abcm2ps EPS files.
+- `T:` → title, `R:` → tune type, `C:` → composer, `Q:` → tempo (default 90).
+- Embellishments become named BWW tokens (`{Gdc}d` → `thrd`, `{gef}e` → `dbe`…).
+- Chord symbols, slurs, `%%` directives and harmony voices (`V:2`…) are dropped,
+  each with a warning. Every warning is printed under the file it came from.
+- Output uses Windows line endings and the BMW Gold 1.0 header.
+
+---
+
 ## ABC Output Format
 
 ```abc
@@ -151,6 +179,8 @@ uv run pytest tests/ -v
 - Repeats with more than two endings may not render perfectly in all ABC players
 - Piobaireacd ornaments (not present in standard march/strathspey/reel repertoire) are not mapped
 - Multi-staff scores (e.g. harmonised pipe band scores) are not supported
+- bagpipemusic.com (Lee & Sons) BWW files store the tune type in the title field
+  and vice versa, so `bmw2abc` output for them has `T:` and `R:` swapped
 
 ---
 
