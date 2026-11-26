@@ -1,0 +1,23 @@
+%%flatbeams 1
+X:1
+T:An Ault Ghlas
+C:Trad.
+B:pipetunes.ca
+R:Reel
+L:1/8
+M:C|
+K:HP
+|: f | {g}Bc{g}de {gfg}f2 {g}ed | {g}c{d}A{g}eA {g}fA{gef}ec | {g}Bc{g}de {gfg}f2 {g}ed | {g}c{d}A{gef}ec {g}B{d}B{e}B :| 
+[| f | {gBd}B2 {Gdc}d2 {g}fBd{e}B | {gAGAG}A2 {gcd}c2 {gef}eA{g}c{d}A | {gBd}B2 {Gdc}d2 {g}fBd{e}B | {g}c{d}A{gdf}ec {g}B{d}B{e}Bf | 
+       {gBd}B2 {Gdc}d2 {g}fBd{e}B | {gAGAG}A2 {gcd}c2 {gef}eA{g}c{d}A | {g}A{d}c{g}Bd {g}ce{g}df | {gef}ecac {g}B{d}B{e}B |]
+%%flatbeams 1
+X:2
+T:An Ault Ghlas
+C:Trad. Arr. Hamish More
+R:Reel
+L:1/8
+M:C|
+K:HP
+|: f | {g}Bc{g}de {g}f2 {g}ed | {g}cA{g}eA {g}fA{g}ec | {g}Bc{g}de {g}f2 {g}ed | {g}cA{g}ec B{g}B{G}B :| 
+[| c | {g}B{G}B {g}d2 {g}eB{g}dB | {g}A{d}A {g}c2 {g}eA{g}cA | {g}B{g}B {g}d2 {g}eB{g}dB | {g}cA{g}ec B{g}B{G}Bc | 
+       {g}B{G}B {g}d2 {g}eB{g}dB | {g}A{d}A {g}c2 {g}eA{g}cA | {g}Ac{g}Bd {g}ce{g}de | {g}ecAc B{g}B{G}B |]

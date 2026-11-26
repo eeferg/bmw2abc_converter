@@ -13,3 +13,6 @@ wheels/
 *.abc
 *.ps
 *.pdf
+
+# ABC test fixtures (from Ed's own collection) are tracked
+!tests/fixtures/**/*.abc

@@ -1,0 +1,28 @@
+%%flatbeams 1
+X:1
+T:The Galloway Hills
+T:Bonnie Banks
+C:Traditional
+B:City of Alexandria Pipe and Drums "Bonnie Banks Set"
+R:March
+L:1/8
+M:4/4
+K:HP
+e | {g}A3 B {GdG}c2 {Gdc}d2 | {gef}e2 a2 {ef}e3 c | {Gdc}d2 {gBd}B>A {g}G3 A | {GdG}Bg- gf {gef}e3 c |
+{g}A3 B {GdG}c2 {Gdc}d2 | {gef}e2 a2 {cd}c2 {g}B{d}A | {Gdc}d>c df {g}e3 d | {gBd}B2 {e}A2 {GAG}A2 {g}c>d ||
+{gef}e2 a2 {cd}c3 d | {gef}e2 a2 {ef}e3 c | {Gdc}d2 {gBd}B>A {g}G3 A | {GdG}B g- gf {gef}e3 c |
+{g}A3 B {GdG}c2 {Gdc}d2 | {gef}e2 a2 {cd}c2 {g}B{d}A | {Gdc}d>c df {g}e3 d | {gBd}B2 {e}A2 {GAG}A2 |]
+
+%%flatbeams 1
+X:1
+T:The Galloway Hills
+C:Traditional
+B:Scots Guards
+R:March
+L:1/8
+M:4/4
+K:HP
+e | {g}A3 B {GdG}c3 d | {gef}e2 {ag}a2 {ef}e3 c | {Gdc}d2 {gBd}B>A {g}G3 {d}B | {g}d g2 f {gef}e3 c |
+{g}A3 B {GdG}c3 d | {gef}e2 {ag}a2 {cd}c2 {gBd}B{G}A | {Gdc}d>c {g}df {gef}e3 d | {gBd}B3 {e}A {GAG}A2 {g}c>d ||
+{gef}e2 {ag}a2 {cd}c3 d | {gef}e2 {ag}a2 {ef}e3 c | {Gdc}d2 {gBd}B>A {g}G3 {d}B | {g}d g2 f {gef}e3 c |
+{g}A3 B {GdG}c3 d | {gef}e2 {ag}a2 {cd}c2 {gBd}B{G}A | {Gdc}d>c {g}df {gef}e3 d | {gBd}B3 {e}A {GAG}A4 |]

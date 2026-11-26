@@ -1,0 +1,13 @@
+%%flatbeams 1
+X:1
+T:Welcome to the Trossacks
+C:Wilfred Gillis
+B:Gathering of the Clans, Vol1
+R:March
+L:1/16
+M:2/4
+K:HP
+|: {g}A>B | {gcd}c3B {g}A>G{g}A>{d}c | {g}e<ac<d {gef}e2{g}A>B | {gcd}c2{g}e>c {g}d<f{g}e>c | {g}A>G{g}B<{d}c {gBd}B2{g}A>B |
+{gcd}c3B {g}A>G{g}A>{d}c | {g}e<ac<d {gef}e2{g}A>B | {gcd}c2{g}e>c {g}B>A{g}B<{d}c | {g}A4 {GAG}A2 :|
+|: {g}c<e | {ag}a>g(3a/g/f/ {g}e>f{g}(3e/c/A/ | {g}A>G{g}A<{d}B {gcd}c2{gef}e>c | {gde}d>c{g}d<f {gef}e>c{e}A>{d}c | {gBG}B>e{g}d>f {gef}e2{A}(3efg |
+{ag}a>g(3a/g/f/ {g}e>f{g}(3e/c/A/ | {gde}d>c{g}d<f {gef}e2{gcd}c>A | {g}G>A{g}B<f {gef}e>c{g}B{d}<c | {g}A4 {GAG}A2 :|

@@ -108,3 +108,12 @@ def test_labelled_ending_n_of_m():
     items = parse_abc(HDR + '["2 of 2"A2 ] :|\n')[0].lines[0].items
     assert items[0] == __import__("bmw2abc_converter.abc_model", fromlist=["Ending"]).Ending(22)
     assert not parse_abc(HDR + '["2 of 2"A2 ] :|\n')[0].warnings
+
+
+def test_line_continuation_joins_lines():
+    t = parse_abc(HDR + "A2 B2 | \\\nc2 d2 |\n")[0]
+    assert len(t.lines) == 1 and [x.pitch for x in notes(t)] == ["A", "B", "c", "d"]
+
+
+def test_consecutive_grace_groups_combine():
+    assert notes(parse_abc(HDR + "{g}{d}{f}e2|\n")[0])[0].grace == "gdf"

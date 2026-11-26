@@ -110,13 +110,13 @@ class _StaffWriter:
 
     def _note_tokens(self, note: Note, suffix: str, staff_no: int) -> list[str]:
         toks: list[str] = []
-        if self.tuplet_left == -1:  # tuplet announced, this is its first note
-            toks.append(f"^{self.tuplet_n}s")
-            self.tuplet_left = self.tuplet_n
         emb, warning = embellishment_tokens(note.grace, note.pitch)
         if warning:
             self.warn(f"staff {staff_no}: {warning}")
         toks += emb
+        if self.tuplet_left == -1:  # tuplet announced; Lee puts ^3s after the grace
+            toks.append(f"^{self.tuplet_n}s")
+            self.tuplet_left = self.tuplet_n
         if note.tie:
             toks.append("^ts")
         dur = bww_duration(note.length)
@@ -215,10 +215,7 @@ class _StaffWriter:
                         tok = "!"
                     else:
                         tok = {"|": "!", ":|": "''!I", "|:": "I!''", "::": "''!I I!''",
-                               "|]": "!I", "[|": "I!"}.get(kind)
-                        if tok is None:  # '||' mid-line
-                            self.warn(f"staff {staff_no}: double bar mid-line written as single bar")
-                            tok = "!"
+                               "|]": "!I", "[|": "I!", "||": "I!"}[kind]
                     if tok == "!":
                         cur = ["!"]
                         physical.append(cur)
@@ -238,11 +235,36 @@ def _format(tokens: list[str], first: bool) -> str:
     return tokens[0] + "\t" + " ".join(tokens[1:])
 
 
+def _carry_pickups(lines: list[Line]) -> list[Line]:
+    """Move notes after a line's last barline to the start of the next line.
+
+    ABC often ends a line with the lead-in to the next part; BWW staves end on a
+    barline, and Lee's files put such pickups at the start of the next staff.
+    """
+    out = [Line(list(l.items), l.part_label) for l in lines]
+    for n in range(len(out) - 1):
+        if not any(isinstance(it, (Note, Rest)) for it in out[n].items):
+            continue
+        items = out[n].items
+        last_bar = max((i for i, it in enumerate(items) if isinstance(it, Bar)), default=None)
+        if last_bar is None:
+            continue
+        trailing = items[last_bar + 1:]
+        if any(isinstance(it, (Note, Rest, Ending, Tuplet)) for it in trailing):
+            del items[last_bar + 1:]
+            out[n + 1].items[:0] = trailing
+    return out
+
+
 def write_bww(tune: Tune) -> str:
     """Complete BWW file text for one tune ('\\n' line endings)."""
     out = _header(tune)
     writer = _StaffWriter(tune)
-    lines = tune.lines
+    lines = _carry_pickups(tune.lines)
+    empty = [n for n, l in enumerate(lines) if not any(isinstance(it, (Note, Rest)) for it in l.items)]
+    for n in empty:
+        writer.warn(f"staff {n + 1}: has no notes; skipped")
+    lines = [l for n, l in enumerate(lines) if n not in empty]
     for n, line in enumerate(lines):
         next_item = lines[n + 1].items[0] if n + 1 < len(lines) and lines[n + 1].items else None
         if line.part_label:

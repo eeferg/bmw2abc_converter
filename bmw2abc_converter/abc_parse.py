@@ -162,8 +162,9 @@ class _TuneParser:
             elif kind == "comment":
                 break
             elif kind == "grace":
-                pending_grace = m.group("grace_body")
-                grace_separated = separated
+                if not pending_grace:
+                    grace_separated = separated
+                pending_grace += m.group("grace_body")
             elif kind == "quote":
                 self.chords += 1
             elif kind == "deco":
@@ -284,7 +285,21 @@ def parse_abc(text: str) -> list[Tune]:
     """Parse an ABC file into one Tune per X: field, in file order."""
     tunes: list[Tune] = []
     parser: _TuneParser | None = None
-    for lineno, raw in enumerate(text.replace("\r\n", "\n").replace("\r", "\n").split("\n"), 1):
+    raw_lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    joined: list[tuple[int, str]] = []
+    carry: tuple[int, str] | None = None
+    for lineno, raw in enumerate(raw_lines, 1):
+        if carry:
+            lineno, raw = carry[0], carry[1] + " " + raw
+            carry = None
+        stripped = raw.rstrip()
+        if stripped.endswith("\\") and not stripped.startswith("%"):
+            carry = (lineno, stripped[:-1])
+            continue
+        joined.append((lineno, raw))
+    if carry:
+        joined.append(carry)
+    for lineno, raw in joined:
         if raw.startswith("X:"):
             if parser:
                 tunes.append(parser.finish())

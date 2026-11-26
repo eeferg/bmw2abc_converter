@@ -1,0 +1,26 @@
+%%flatbeams 1
+X:1
+T:Wagenborgen
+C:Unknown, Arranged by John Sprague
+R:March
+L:1/8
+M:4/4
+K:HP
+V:1 clef=treble
+e | {g}A3 {d}c {g}B{d}A {g}B{d}c | {ag}a3 e {g}f2 {e}f/>g/a | e2 a>f {g}ec {g}B{d}A | {g}B4 {GdGe}B3 e |
+  [2  {g}A3 {d}c {g}B{d}A {g}B{d}c | {ag}a3 e {g}f2 {e}f/>g/a | e2 a>f {g}ec {g}B>{d}c | {g}A4 {GAG}A3 :|
+%e | {g}A3 {d}c {g}B{d}A {g}B{d}c | {ag}a3 e {g}f2 {e}f/>g/a | e2 a>f {g}ec {g}B{d}A | {g}B4 {GdGe}B3 e |
+%    {g}A3 {d}c {g}B{d}A {g}B{d}c | {ag}a3 e {g}f2 {e}f/>g/a | e2 a>f {g}ec {g}B>{d}c | {g}A4 {GAG}A3 ||
+e | {ag}a3 e {f}f2 a2 | A3 B {GdG}c3 e | f2 {GdG}fe {g}fa ec | {g}B4 {GdGe}B3 e |
+  [1 {ag}a3 e {g}f2 a2 | A3 B {GdG}c3 e | {g}f2 a>f {g}ec {g}B>{d}c | {g}A4 {GAG}A3 :|
+%e | {ag}a3 e {f}f2 a2 | A3 B {GdG}c3 e | f2 {GdG}fe {g}fa ec | {g}B4 {GdGe}B3 e |
+% {g}A3 {d}c {g}B{d}A {g}B{d}c | {ag}a3 e {g}f2 {e}f/>g/a | e2 a>f {g}ec {g}B>{d}c | {g}A4 {GAG}A3 |]
+%V:2 clef=treble
+%e | {g}A3 {d}c {g}B{d}A {g}B{d}c | {ag}a3 e {g}f2 {e}f/>g/a | e2 a>f {g}ec {g}B{d}A | {g}B4 {GdGe}B3 e |
+%    {g}A3 {d}c {g}B{d}A {g}B{d}c | {ag}a3 e {g}f2 {e}f/>g/a | e2 a>f {g}ec {g}B>{d}c | {g}A4 {GAG}A3 |
+%e | {g}A3 {d}c {g}B{d}A {g}B{d}c | {gcd}cA Bc D2 {c}d/>e/f | c2 {g}c>d {g} ce {g}dc | g>a gf e4 |
+%    {g}c3 e {g}d3 e | {gfg}f3 c {g}d3 e | {g}c2- c>d e4 | {g}c>e cB {GdG}c3 ||
+%e | {ag}a3 e {f}f2 a2 | A3 B {GdG}c3 e | f2 {GdG}fe {g}fa ec | {g}B4 {GdGe}B3 e |
+%    {ag}a3 e {g}f2 a2 | A3 B {GdG}c3 e | {g}f2 a>f {g}ec {g}B>{d}c | {g}A4 {GAG}A3 |
+%e | {gcd}cA Bc {g}d3 f | {g}e>f ed e3 A | d3 c {g}dB cA | g>a gf e4 |
+%    {g}c3 e {g}d3 e | {gfg}f3 c {g}d3 e | {g}c2- c>d e4 | {g}c>e cB {GdG}c3 |]

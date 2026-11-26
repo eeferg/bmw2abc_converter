@@ -89,3 +89,40 @@ def test_grace_warning_carried():
 
 def test_inline_meter_change():
     assert "C_" in music("A4 | [M:C|] B4|\n", HDR8)[5:]
+
+
+def test_triplet_marker_follows_grace_like_lee():
+    # Lee: "thrd D_4 gg ^3s Er_16 Fl_16 HGl_16 ^3e"
+    assert music("{g}(3efg A2|\n", HDR8)[4:] == [
+        "gg", "^3s", "Er_8", "Fl_8", "HGl_8", "^3e", "LA_4", "!t"]
+
+
+def test_trailing_pickup_moves_to_next_staff():
+    t = parse_abc(HDR8 + "A2 B2 | c2 e\n|1 f2 d2 :|\n")[0]
+    out = write_bww(t)
+    m = out[out.index("&"):].split()
+    # the unfinished bar "c2 e" continues at the start of the next staff
+    assert m == ["&", "sharpf", "sharpc", "2_4", "LA_4", "B_4", "!t",
+                 "&", "sharpf", "sharpc", "C_4", "E_8", "!", "'1", "F_4", "D_4", "_'", "''!I"]
+    assert not any("mid-bar" in w for w in t.warnings)
+
+
+def test_mid_line_double_bar_is_I():
+    t = parse_abc(HDR8 + "A4 || B4 |\n")[0]
+    assert music("A4 || B4 |\n", HDR8)[4:] == ["LA_2", "I!", "B_2", "!t"]
+
+
+def test_ending_started_at_line_end_moves_to_next_staff():
+    t = parse_abc(HDR8 + "|1 A4 :|2\nB4 |]\n")[0]
+    out = write_bww(t)
+    assert out[out.index("&"):].split() == [
+        "&", "sharpf", "sharpc", "2_4", "'1", "LA_2", "_'", "!t",
+        "&", "sharpf", "sharpc", "'2", "B_2", "_'", "!I"]
+    assert not any("mid-bar" in w for w in t.warnings)
+
+
+def test_staff_with_no_notes_is_skipped():
+    t = parse_abc(HDR8 + "A4 |\n |   |   |\n")[0]
+    out = write_bww(t)
+    assert out.count("& sharpf sharpc") == 1
+    assert any("no notes" in w for w in t.warnings)
