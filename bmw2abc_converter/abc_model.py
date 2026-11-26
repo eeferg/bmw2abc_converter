@@ -31,6 +31,11 @@ class Ending:
 
 
 @dataclass
+class EndingClose:
+    """Explicit ']' closing a 1st/2nd ending."""
+
+
+@dataclass
 class Tuplet:
     count: int
 
@@ -40,7 +45,7 @@ class Meter:
     meter: str  # as in ABC, e.g. "C|", "6/8"
 
 
-Item = Note | Rest | Bar | Ending | Tuplet | Meter
+Item = Note | Rest | Bar | Ending | EndingClose | Tuplet | Meter
 
 
 @dataclass
