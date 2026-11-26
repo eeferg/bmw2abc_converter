@@ -43,6 +43,11 @@ _OVERRIDES: dict[str, str] = {
     "G2": "echolg",
 }
 
+# Grace strings written by older versions of the BWW->ABC converter.
+_LEGACY: dict[tuple[str, str], str] = {
+    ("gec", "d"): "lgstd",  # bww2abc.js rendered lgstd as {gec}; correct is {gdc}
+}
+
 _SINGLE = {"A": "ag", "B": "bg", "c": "cg", "d": "dg", "e": "eg",
            "f": "fg", "g": "gg", "a": "tg"}
 
@@ -51,6 +56,8 @@ def embellishment_tokens(grace: str, pitch: str) -> tuple[list[str], str | None]
     """BWW tokens for ABC grace group `grace` before note `pitch`, plus a warning."""
     if not grace:
         return [], None
+    if (grace, pitch) in _LEGACY:
+        return [_LEGACY[(grace, pitch)]], None
     if (grace, pitch) in GRACE_PREFS:
         return [GRACE_PREFS[(grace, pitch)]], None
     candidates = _BY_SEQ.get(grace, [])

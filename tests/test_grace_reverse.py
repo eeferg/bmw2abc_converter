@@ -10,7 +10,7 @@ from bmw2abc_converter.grace_reverse import embellishment_tokens
     ("GdG", "A", "grp"), ("gBd", "B", "dbb"), ("gfg", "f", "dbf"),
     ("gf", "g", "dbhg"), ("ag", "a", "dbha"), ("fg", "f", "hdbf"),
     ("GAG", "A", "brl"), ("AGAG", "A", "abr"), ("gAGAG", "A", "gbr"),
-    ("GdGe", "e", "tar"), ("gec", "d", "lgstd"),
+    ("GdGe", "e", "tar"), ("gdc", "d", "lgstd"),
 ])
 def test_common_collection_graces(grace, pitch, token):
     assert embellishment_tokens(grace, pitch) == ([token], None)
@@ -36,3 +36,20 @@ def test_every_grace_token_round_trips_or_is_known_collision():
             collisions.append(token)
     print("collisions:", collisions)
     assert len(collisions) < 40, collisions
+
+
+def test_light_g_strike_on_d_is_gdc():
+    # Ed's collection writes this 115x as {gdc}d; ltstd is "adc" by the same pattern.
+    assert GRACE["lgstd"] == "gdc"
+    assert embellishment_tokens("gdc", "d") == (["lgstd"], None)
+
+
+def test_bmw2abc_renders_lgstd_as_gdc():
+    from bmw2abc_converter import convert
+    out = convert("& sharpf sharpc 2_4 lgstd D_4 !t\n")
+    assert "{gdc}d" in out
+
+
+def test_legacy_gec_before_d_still_means_lgstd():
+    # ABC made by the old converter wrote lgstd as {gec}d
+    assert embellishment_tokens("gec", "d") == (["lgstd"], None)

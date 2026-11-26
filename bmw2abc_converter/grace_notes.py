@@ -58,7 +58,7 @@ GRACE: dict[str, str] = {
     "gstb": "gBG",
     "gstc": "gcG",
     "gstd": "gdG",
-    "lgstd": "gec",
+    "lgstd": "gdc",  # was "gec" in bww2abc.js; light strike = g,d,c (cf. ltstd "adc")
     "gste": "geA",
     "gstf": "gfe",
 
