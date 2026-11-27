@@ -20,3 +20,4 @@ wheels/
 
 # Purchased BWW files (Lee & Sons etc.) — never commit; repo is public
 private/
+scratch/
