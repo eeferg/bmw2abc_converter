@@ -96,5 +96,7 @@ skipped when those aren't set.
 
 ## License
 
-GPL-3.0-or-later. `bww2abc` is a port of Jean-Francois Moine's `bww2abc.js`
-(GPL3+), and the gracenote tables derive from it.
+GPL-3.0-or-later; see [LICENSE](LICENSE). `bww2abc` is a port of Jean-Francois
+Moine's `bww2abc.js` (GPL3+), and the gracenote tables derive from it.
+
+Copyright © Jean-Francois Moine (bww2abc.js) and eeferg (this port and abc2bww).
