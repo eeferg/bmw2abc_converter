@@ -15,8 +15,9 @@ them as you go.
 
 ## 2. Embellishment tables
 
-- [ ] `lgstd` changed from `{gec}` to `{gdc}`, the way you write it 115 times.
-      `bmw2abc` now writes `{gdc}d` as well. Is this right?
+- [x] `lgstd` changed from `{gec}` to `{gdc}`, the way you write it 115 times.
+      `bmw2abc` now writes `{gdc}d` as well. Confirmed: your commit 3027efd on
+      main (2026-11-25) made the same fix.
 - [ ] `lhstd` is `{ed}`. It looks wrong in the same way but hasn't been changed.
       What should it be?
 
