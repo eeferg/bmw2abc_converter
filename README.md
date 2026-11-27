@@ -4,7 +4,7 @@ Convert bagpipe music between **Bagpipe Music Writer** (`.bww`) and **ABC**
 notation, in both directions.
 
 - **`bww2abc`** — BWW → ABC, for typesetting with
-  [abcm2ps](https://github.com/lewdlime/abcm2ps) or editing as text. It also
+  [pipes2ps](https://github.com/eeferg/pipes2ps) (or abcm2ps), or editing as text. It also
   reads legacy pre-Gold `.bmw` files.
 - **`abc2bww`** — ABC → BWW (Bagpipe Music Writer Gold), for opening ABC tunes
   in BMW Gold or importing them into apps that read BWW but not ABC (such as
@@ -13,6 +13,13 @@ notation, in both directions.
 Embellishments stay named on both sides: `{gef}e` ↔ `dbe`, `{Gdc}d` ↔ `thrd`,
 `{GdGe}A` ↔ `tar`. `bww2abc` is based on
 [bww2abc.js](http://moinejf.free.fr/bww2abc) by Jean-Francois Moine.
+
+## Part of a suite
+
+| Tool | Does |
+|---|---|
+| **bww-abc** (this repo) | Bagpipe Music Writer (`.bww`) ↔ ABC, both directions |
+| [**pipes2ps**](https://github.com/eeferg/pipes2ps) | ABC → printable score (PostScript/SVG); an edition of abcm2ps for pipes and trad music |
 
 ## Install
 

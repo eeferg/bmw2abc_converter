@@ -11,6 +11,9 @@ publicly for other pipers:
   also reads legacy pre-Gold `.bmw` files.
 - `abc2bww`: ABC → BWW Gold, for pipe-tune ABC as written for abcm2ps.
 
+Sister project: **pipes2ps** (`~/projects/eeferg/pipes2ps`, ABC → score; Ed's
+edition of abcm2ps). A LaTeX tune-book framework is planned as a third part.
+
 Say "BWW" everywhere. Use "BMW" only for the legacy pre-Gold format, or for the
 Bagpipe Music Writer program itself. A Rust port (CLI binaries plus WASM for a web
 page) is a possible future step; the Python stays the reference implementation.
