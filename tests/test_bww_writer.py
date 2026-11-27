@@ -138,3 +138,13 @@ def test_repeat_before_second_ending_kept_across_lines():
 def test_body_meter_line_kept():
     m = music("A2 B2 |\nM:3/4\nA2 B2 c2 |]\n", HDR8)
     assert m[6:] == ["!t", "&", "sharpf", "sharpc", "3_4", "LA_4", "B_4", "C_4", "!I"]
+
+
+def test_source_written_as_footer():
+    out = write_bww(parse_abc(HDR.replace("K:HP", "B:PM Tom Johnstone Handout\nK:HP") + "A4|\n")[0])
+    assert '"PM Tom Johnstone Handout",(F,L,0,0,Times New Roman,10,400,0,0,18,0,0,0)' in out
+    assert out.index("(F,") < out.index("&")
+
+
+def test_no_footer_without_source():
+    assert "(F," not in write_bww(parse_abc(HDR + "A4|\n")[0])

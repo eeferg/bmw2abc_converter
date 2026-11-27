@@ -111,6 +111,9 @@ class _TuneParser:
             if not self.have_composer:
                 self.tune.composer = value or None
                 self.have_composer = True
+        elif name == "B":
+            if value:
+                self.tune.source = f"{self.tune.source}; {value}" if self.tune.source else value
         elif name == "Q":
             if self.tune.tempo is None:
                 self.tune.tempo = _parse_tempo(value)

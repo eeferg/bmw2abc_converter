@@ -122,3 +122,14 @@ def test_consecutive_grace_groups_combine():
 def test_missing_key_field_warns():
     t = parse_abc("X:1\nT:No key\nM:2/4\nL:1/8\nA2 B2|\n")[0]
     assert any("K:" in w for w in t.warnings)
+
+
+def test_source_field():
+    assert parse_abc(HDR.replace("K:HP", "B:PM Tom Johnstone Handout\nK:HP") + "A2|\n")[0].source == \
+        "PM Tom Johnstone Handout"
+    assert parse_abc(HDR + "A2|\n")[0].source is None
+
+
+def test_source_field_several_joined():
+    hdr = HDR.replace("K:HP", "B:Book One\nB:Book Two\nK:HP")
+    assert parse_abc(hdr + "A2|\n")[0].source == "Book One; Book Two"

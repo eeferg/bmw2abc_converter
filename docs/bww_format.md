@@ -49,7 +49,7 @@ All metadata appears before the `&` clef line.
 | `"Title",(T,...)` | Tune title | `T:Title` |
 | `"Composer",(M,...)` | Composer | `C:Composer` |
 | `"Type",(Y,...)` | Tune type/rhythm | `R:Type` |
-| `"Footer",(F,...)` | Footer text | `%%footer \tFooter` |
+| `"Footer",(F,...)` | Footer text | `%%footer \tFooter`; abc2bww writes `B:` here |
 | `"Text",(...)` | Other text (no `,T/M/Y/F`) | `% Text` (comment) |
 | `TuneTempo,90` | Tempo (♩= 90) | `Q:1/4=90` |
 

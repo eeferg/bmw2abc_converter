@@ -32,6 +32,7 @@ DEFAULT_TEMPO = 90
 _TITLE_FMT = "(T,C,0,0,Times New Roman,24,700,0,0,18,0,0,0)"
 _TYPE_FMT = "(Y,L,0,0,Times New Roman,14,700,0,0,18,0,0,0)"
 _COMPOSER_FMT = "(M,R,0,0,Times New Roman,14,700,0,0,18,0,0,0)"
+_FOOTER_FMT = "(F,L,0,0,Times New Roman,10,400,0,0,18,0,0,0)"
 
 _CLEF = "& sharpf sharpc"
 _CLOSERS = {":|", "||", "|]", "|:", "::"}
@@ -57,6 +58,8 @@ def _header(tune: Tune) -> list[str]:
         out.append(_quote(tune.tune_type) + "," + _TYPE_FMT)
     if tune.composer:
         out.append(_quote(tune.composer) + "," + _COMPOSER_FMT)
+    if tune.source:  # B: has no BWW field; the footer is the closest home
+        out.append(_quote(tune.source) + "," + _FOOTER_FMT)
     out += ["", ""]
     return out
 

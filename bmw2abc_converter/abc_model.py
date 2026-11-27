@@ -59,6 +59,7 @@ class Tune:
     title: str = ""
     tune_type: str | None = None
     composer: str | None = None
+    source: str | None = None  # B: lines, joined with '; '
     tempo: int | None = None
     meter: str = "4/4"
     lines: list[Line] = field(default_factory=list)
