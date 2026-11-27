@@ -138,6 +138,7 @@ tunes marked `B:Lee & Sons` or purchased books.
 3. **Section labels** (`"2nd Part"`) — standalone quoted lines between parts; detect at line level before splitting tokens
 4. **Tie + grace note ordering** — tie flag must output `-` after the note, not immediately when `^ts` is seen
 5. **Time sig not last on `&` line** — scan all tokens for time sig; trailing tokens may be music (e.g. `I!''`)
+6. **Legacy (pre-Gold) files** — no `Bagpipe…` first line; positional header; `^t<pitch>`/`^3<pitch>` follow the note(s), so `^te`/`^3e` are old ties/triplets on E unless a Gold `^ts`/`^3s` is open. See `docs/bmw_legacy_format.md`
 
 ---
 

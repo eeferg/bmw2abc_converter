@@ -84,17 +84,20 @@ triplet end.
 
 ## What bmw2abc does with old-format files
 
-The 2026-11-27 survey found these problems. None is fixed yet.
+The 2026-11-27 survey found these problems. bmw2abc only reads this format;
+abc2bww always writes Gold.
 
 | Problem | Severity | Status |
 |---|---|---|
-| Old tie on E (`^te`) treated as a Gold tie end, so the tie is silently dropped | wrong output | open |
-| Old triplets: `(3` written after the triplet, onto the following notes, not before it | wrong output | open |
-| Old header gives no `T:`/`R:`/`C:`; title, type and composer become `%` comments | wrong output | open |
-| `\x1a` reported as an unknown token | noise | open |
+| Old tie on E (`^te`) treated as a Gold tie end, so the tie is silently dropped | wrong output | **fixed** |
+| Old triplets: `(3` written after the triplet, onto the following notes, not before it | wrong output | **fixed** |
+| Old header gives no `T:`/`R:`/`C:`; title, type and composer become `%` comments | wrong output | **fixed** |
+| `\x1a` reported as an unknown token | noise | **fixed** |
+| Old tie after a barline or at the start of the next staff put `-` in the wrong place | wrong output | **fixed** |
+| Tie across a staff break marked on both staves gave `--` | wrong output | **fixed** |
 | Tokens run together with no line breaks (`HAl_16!`) | wrong output | open |
 
-Proposed fixes:
+How they were fixed (tests in `tests/test_legacy_bmw.py`):
 
 - **Ties on E:** a `^te` is a Gold tie end only when a `^ts` is open. Otherwise
   it's an old tie on E.
@@ -103,3 +106,9 @@ Proposed fixes:
 - **Header:** the leading quoted lines are mapped by position: title → `T:`,
   type → `R:`, composer → `C:`, footer → `%%footer`.
 - **`\x1a`:** stripped as the file is read.
+- **Tie placement:** a legacy tie's `-` goes right after the previous note,
+  before any barline. If that note already has a `-`, nothing is added.
+
+Checked against the archive: abcm2ps errors went from 223 files to 149. 80
+files are now clean; 6 now report "Line too much shrunk" only, because their
+lines carry the ties they were missing before.

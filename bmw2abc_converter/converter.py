@@ -28,6 +28,9 @@ _DOTTED_LT_RE = re.compile(r"([A-Ga-g])\/(?!\/) ?((?:\{[^}]*\})?)([A-Ga-g])3\/")
 _DOTTED_GT2_RE = re.compile(r"([A-Ga-g])3 ?((?:\{[^}]*\})?)([A-Ga-g])(?![/\d])")
 _DOTTED_LT2_RE = re.compile(r"([A-Ga-g])((?:\{[^}]*\})?)([A-Ga-g])3(?![/\d])")
 
+# Barlines/whitespace at the end of a measure string (where a legacy tie goes before).
+_TRAILING_BAR_RE = re.compile(r"[\s|:\]]*$")
+
 # BWW visual-spacing tokens with no musical meaning.
 _SKIP_TOKENS = frozenset({"space"})
 
@@ -90,7 +93,13 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
     swap_title_type: treat the BWW T field as tune type and Y as title, for
         bagpipemusic.com (Lee & Sons) files which store them the wrong way round.
     """
+    bww_text = bww_text.replace("\x1a", "")  # DOS end-of-file byte (legacy files)
     lines = bww_text.splitlines()
+    # Pre-Gold files have no "Bagpipe ..." first line; their header text lines
+    # carry no (T,...) codes and are identified by position.
+    first_line = next((l.strip() for l in lines if l.strip()), "")
+    legacy = not first_line.startswith("Bagpipe")
+    legacy_kinds = iter("TYMF")
     out: list[str] = []
     out.append(f"%abc-2.2\n% Converted from {filename} to ABC by bmw2abc_converter\n\nX:1")
 
@@ -110,15 +119,24 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
 
         if first == '"':
             j = l.find('"', 1)
-            if j <= 0:
-                continue
-            text = l[1:j]
-            if not text:
-                continue
-            if len(l) <= j + 2 or l[j + 1] != ",":
-                out.append("% " + text)
-                continue
-            kind = l[j + 3] if len(l) > j + 3 else ""
+            if legacy and (j <= 0 or len(l) <= j + 2 or l[j + 1] != ","):
+                text = l[1:j] if j > 0 else l[1:].strip()
+                kind = next(legacy_kinds, "")
+                if not text:
+                    continue
+                if not kind:
+                    out.append("% " + text)
+                    continue
+            else:
+                if j <= 0:
+                    continue
+                text = l[1:j]
+                if not text:
+                    continue
+                if len(l) <= j + 2 or l[j + 1] != ",":
+                    out.append("% " + text)
+                    continue
+                kind = l[j + 3] if len(l) > j + 3 else ""
             if swap_title_type and kind in ("T", "Y"):
                 kind = "Y" if kind == "T" else "T"
             if kind == "T":
@@ -190,9 +208,52 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
     pending_acc = ""
     beam = False
     fermata = False
+    tie_open = False      # a Gold ^ts is waiting for its ^te
+    triplet_open = False  # a Gold ^3s is waiting for its ^3e
+    note_starts: list[int] = []  # where each note (with its graces) starts in `measure`
+    unit_start: int | None = None  # start of graces/accidental before the next note
+
+    def flush(suffix: str) -> None:
+        nonlocal measure, unit_start
+        out.append(measure + suffix)
+        measure = ""
+        note_starts.clear()
+        unit_start = None
+
+    def mark_unit() -> None:
+        nonlocal unit_start
+        if unit_start is None:
+            unit_start = len(measure)
+
+    def old_tie() -> None:
+        # Legacy ^t<pitch> follows the first note, sometimes after a barline or
+        # at the start of the next staff: put '-' right after that note.
+        nonlocal measure
+        # A tie across a staff break may be marked on both staves: tie once.
+        if measure.strip():
+            at = _TRAILING_BAR_RE.search(measure).start()
+            if measure[:at].endswith("-"):
+                return
+            measure = measure[:at] + "-" + measure[at:]
+        elif len(out) and out[-1].strip():
+            at = _TRAILING_BAR_RE.search(out[-1]).start()
+            if out[-1][:at].endswith("-"):
+                return
+            out[-1] = out[-1][:at] + "-" + out[-1][at:]
+
+    def old_tuplet(n: int) -> None:
+        # legacy ^3<pitch> follows the last note of the triplet
+        nonlocal measure
+        if len(note_starts) < n:
+            measure += f"({n}"
+            return
+        at = note_starts[-n]
+        measure = measure[:at] + f"({n}" + measure[at:]
+        for idx in range(len(note_starts) - n + 1, len(note_starts)):
+            note_starts[idx] += 2
 
     def process_tokens(tokens: list[str]) -> None:
-        nonlocal measure, tie, pending_acc, beam, fermata
+        nonlocal measure, tie, pending_acc, beam, fermata, tie_open, triplet_open, unit_start
 
         k = 0
         while k < len(tokens):
@@ -205,8 +266,7 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
             # --- Structural / barline tokens ---
 
             if t == "''!I":
-                out.append(measure + " :|")
-                measure = ""
+                flush(" :|")
                 continue
 
             if t in ("_", "_'"):
@@ -214,18 +274,15 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
                 continue
 
             if t == "!t":
-                out.append(measure + " |")
-                measure = ""
+                flush(" |")
                 continue
 
             if t == "!!t":
-                out.append(measure + " ||")
-                measure = ""
+                flush(" ||")
                 continue
 
             if t == "!I":
-                out.append(measure + " |]")
-                measure = ""
+                flush(" |]")
                 continue
 
             if t == "I!''":
@@ -267,17 +324,25 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
 
             if t[0] == "^":
                 ch = t[1] if len(t) > 1 else ""
+                rest = t[2:]
                 if ch == "t":
-                    if len(t) > 2 and t[2] == "s":
-                        # New format: tie starts here; output '-' after the next note.
+                    if rest == "s":
+                        # Gold: tie starts here; output '-' after the next note.
                         tie = True
-                    elif len(t) > 2 and t[2] == "e":
-                        pass  # new format end: nothing to do
+                        tie_open = True
+                    elif rest == "e" and tie_open:
+                        tie_open = False  # Gold tie end
                     else:
-                        # Old format bare ^t: output '-' immediately.
-                        measure += "-"
+                        old_tie()  # legacy ^t<pitch>; ^te here is a tie on E
                 elif ch in "23":
-                    if len(t) <= 2 or t[2] != "e":
+                    if rest == "s":
+                        measure += "(" + ch
+                        triplet_open = True
+                    elif rest == "e" and triplet_open:
+                        triplet_open = False  # Gold triplet end
+                    elif rest:
+                        old_tuplet(int(ch))  # legacy ^3<pitch>; ^3e here ends on E
+                    else:
                         measure += "(" + ch
                 elif ch in "4567":
                     if len(t) <= 2 or t[2] != "e":
@@ -319,6 +384,8 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
             if m:
                 letter, beam_dir, denom_str = m.group(1), m.group(2), m.group(3)
                 denom = int(denom_str)
+                note_starts.append(unit_start if unit_start is not None else len(measure))
+                unit_start = None
 
                 if pending_acc:
                     measure += pending_acc
@@ -363,10 +430,12 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
             # --- Grace notes and decorations ---
 
             if t in GRACE:
+                mark_unit()
                 measure += "{" + GRACE[t] + "}"
                 continue
 
             if t in DECO:
+                mark_unit()
                 measure += DECO[t]
                 continue
 
@@ -374,6 +443,7 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
 
             acc_m = _ACC_RE.match(t)
             if acc_m:
+                mark_unit()
                 acc_type = acc_m.group(1)
                 pending_acc = {"sharp": "^", "flat": "_", "natural": "="}.get(acc_type, "")
                 continue
