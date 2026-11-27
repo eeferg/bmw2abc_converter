@@ -25,7 +25,6 @@ _OVERRIDES: dict[str, str] = {
     "gf": "dbhg",   # doubling on high G
     "ag": "dbha",   # doubling on high A
     "dG": "hgrp",   # half grip
-    "ed": "lhstd",  # light half strike on D
     "fe": "hstf",   # half strike on F
     "eA": "hste",   # half strike on E
     "GdG": "grp",   # grip

@@ -1,5 +1,6 @@
 import pytest
 
+from bmw2abc_converter import convert
 from bmw2abc_converter.grace_notes import GRACE
 from bmw2abc_converter.grace_reverse import embellishment_tokens
 
@@ -53,3 +54,9 @@ def test_bmw2abc_renders_lgstd_as_gdc():
 def test_legacy_gec_before_d_still_means_lgstd():
     # ABC made by the old converter wrote lgstd as {gec}d
     assert embellishment_tokens("gec", "d") == (["lgstd"], None)
+
+
+def test_light_half_strike_on_d():
+    # BMW manual: lhstd = light half strike on D = {dc}d ({ed}d is unplayable)
+    assert GRACE["lhstd"] == "dc"
+    assert "{dc}d" in convert('& sharpf sharpc 2_4 lhstd D_4 !I\n', filename="t.bww")

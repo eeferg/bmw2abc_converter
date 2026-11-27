@@ -18,8 +18,11 @@ them as you go.
 - [x] `lgstd` changed from `{gec}` to `{gdc}`, the way you write it 115 times.
       `bmw2abc` now writes `{gdc}d` as well. Confirmed: your commit 3027efd on
       main (2026-11-25) made the same fix.
-- [ ] `lhstd` is `{ed}`. It looks wrong in the same way but hasn't been changed.
-      What should it be?
+- [x] `lhstd` was `{ed}`, which is wrong. The BMW manual gives the light half
+      strike on D as `{dc}d`, and the table now has that. `{ed}d` appears
+      nowhere in the collection. abc2bww writes `{dc}d` as `hthrd` (half D
+      throw), which has the same gracenotes.
+- [x] `gstd` = `{gdG}d`, confirmed from the BMW manual.
 
 ## 3. Lee-marked tunes that differ from Lee's file
 

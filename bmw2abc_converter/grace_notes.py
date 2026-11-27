@@ -77,7 +77,7 @@ GRACE: dict[str, str] = {
     "hstb": "BG",
     "hstc": "cG",
     "hstd": "dG",
-    "lhstd": "ed",
+    "lhstd": "dc",  # was "ed" in bww2abc.js (unplayable); BMW manual: light half strike on D
     "hste": "eA",
     "hstf": "fe",
     "hsthg": "gf",
