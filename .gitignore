@@ -16,3 +16,6 @@ wheels/
 
 # ABC test fixtures (from Ed's own collection) are tracked
 !tests/fixtures/**/*.abc
+
+# Purchased BWW files (Lee & Sons etc.) — never commit; repo is public
+private/

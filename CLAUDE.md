@@ -124,7 +124,7 @@ Sons) files swap `T` and `Y`; `abc2bww` always writes the standard form.
 
 ## Purchased files — never commit
 
-`bmw-to-convert/`, `convert/` and the Lee & Sons NAS folder hold purchased BWW files.
+`private/` (git-ignored; holds `bmw-to-convert/` and `convert/`) and the Lee & Sons NAS folder hold purchased BWW files.
 This repo is public: never copy them (or ABC made from them) into the repo. Test
 fixtures come only from Ed's na_maragan_collection (a private repo), and never from
 tunes marked `B:Lee & Sons` or purchased books.
