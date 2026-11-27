@@ -53,6 +53,15 @@ _SINGLE = {"A": "ag", "B": "bg", "c": "cg", "d": "dg", "e": "eg",
 
 def embellishment_tokens(grace: str, pitch: str) -> tuple[list[str], str | None]:
     """BWW tokens for ABC grace group `grace` before note `pitch`, plus a warning."""
+    tokens, warning = _lookup(grace, pitch)
+    if grace and grace[-1] == pitch:
+        # e.g. {ed}d: no note between the last gracenote and the melody note
+        bad = f"grace {{{grace}}} ends on the melody note {pitch} (not playable; check the ABC)"
+        warning = f"{bad}; {warning}" if warning else bad
+    return tokens, warning
+
+
+def _lookup(grace: str, pitch: str) -> tuple[list[str], str | None]:
     if not grace:
         return [], None
     if (grace, pitch) in _LEGACY:

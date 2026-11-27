@@ -51,6 +51,24 @@ both Cabar Fèidh settings, and Farewell to the Creeks (reel).
 - [ ] `tail_toddle.abc` has a capital `D` twice. That's below the chanter's
       range; it's converted as `d`.
 
+### Gracenote groups that end on the melody note's own pitch
+
+A group like `{ed}d` can't be played: nothing separates the last gracenote
+from the melody note. abc2bww now warns about these ("ends on the melody
+note"). The line numbers are from the 2026-11-27 copy of the collection.
+
+- [ ] pipe_hornpipe/crossing_the_minch.abc line 13: `{g}g`
+- [ ] pipe_march/father_eugenes_welcome_to_cape_north_2_4.abc line 12: `{g}g`
+- [ ] pipe_march/haughs_of_cromdale_2_4.abc lines 30, 31, 34: `{g}g` (Lee has `{f}g`; see section 3)
+- [ ] pipe_march/macleod_of_mull_6_8.abc line 15: `{gef}f` (`{gef}` is the doubling on E)
+- [ ] pipe_march/minstrel_boy_4_4.abc line 24: `{fg}g`
+- [ ] pipe_march/teribus_2_4.abc lines 10, 12: `{gf}f`
+- [ ] pipe_march/wagenborgen_4_4.abc lines 14, 16, 23: `{f}f`. This tune is also
+      a test fixture (`tests/fixtures/abc/`), so fix the copy there as well.
+- [ ] pipe_reel/kalabakan.abc line 11 (twice) and line 12: `{a}a`
+- [ ] pipe_strathspey/dalnahassaig.abc line 10: `{gf}f`. This tune is also a test
+      fixture, so fix the copy there as well.
+
 ## 5. Decisions made while you were away
 
 Change any you disagree with.

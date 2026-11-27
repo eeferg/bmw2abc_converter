@@ -11,7 +11,7 @@ from bmw2abc_converter.grace_reverse import embellishment_tokens
     ("GdG", "A", "grp"), ("gBd", "B", "dbb"), ("gfg", "f", "dbf"),
     ("gf", "g", "dbhg"), ("ag", "a", "dbha"), ("fg", "f", "hdbf"),
     ("GAG", "A", "brl"), ("AGAG", "A", "abr"), ("gAGAG", "A", "gbr"),
-    ("GdGe", "e", "tar"), ("gdc", "d", "lgstd"),
+    ("GdGe", "A", "tar"), ("gdc", "d", "lgstd"),
 ])
 def test_common_collection_graces(grace, pitch, token):
     assert embellishment_tokens(grace, pitch) == ([token], None)
@@ -60,3 +60,15 @@ def test_light_half_strike_on_d():
     # BMW manual: lhstd = light half strike on D = {dc}d ({ed}d is unplayable)
     assert GRACE["lhstd"] == "dc"
     assert "{dc}d" in convert('& sharpf sharpc 2_4 lhstd D_4 !I\n', filename="t.bww")
+
+
+@pytest.mark.parametrize("grace,pitch", [("ed", "d"), ("g", "g"), ("gef", "f"), ("a", "a"), ("fg", "g")])
+def test_grace_ending_on_melody_pitch_warns(grace, pitch):
+    tokens, warning = embellishment_tokens(grace, pitch)
+    assert tokens  # still written, so nothing is silently lost
+    assert warning and "ends on the melody note" in warning
+
+
+def test_grace_ending_elsewhere_does_not_warn():
+    assert embellishment_tokens("dc", "d") == (["hthrd"], None)
+    assert embellishment_tokens("gdG", "d")[1] is None
