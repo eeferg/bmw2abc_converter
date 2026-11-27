@@ -1,14 +1,16 @@
 # BWW File Format Reference
 
 BWW (Bagpipe Music Writer) files are plain-text files produced by Bagpipe Music Writer Gold
-and the free Bagpipe Reader/Player. Both `.bmw` and `.bww` extensions exist; the format is
-identical.
+and the free Bagpipe Reader/Player. This document describes the Gold format
+(first line `Bagpipe Music Writer Gold:1.0`). The extension doesn't tell you the
+format: `.bww` and `.bmw` files can each be Gold or the older pre-Gold format,
+which is described in [bmw_legacy_format.md](bmw_legacy_format.md).
 
 Primary references:
 - BNF spec: http://forums.bobdunsire.com/forums/showthread.php?t=123219
 - Bagpipe_Reader.pdf (bundled with Bagpipe Reader)
-- MuseScore bww2mxml lexer: `docs/musescore_bww_lexer.cpp`
-- bww2abc.js by Jean-Francois Moine (GPL3+): `docs/bww2abc_original.js`
+- MuseScore bww2mxml lexer: [reference/musescore_bww_lexer.cpp](reference/musescore_bww_lexer.cpp)
+- bww2abc.js by Jean-Francois Moine (GPL3+): [reference/bww2abc_original.js](reference/bww2abc_original.js)
 
 ---
 
@@ -343,8 +345,13 @@ ABC note letters: `G`=Low-G, `A`=Low-A, `B`=B, `c`=C, `d`=D, `e`=E, `f`=F, `g`=H
 | `hdbe` | `ef` |
 | `hdbf` | `fg` |
 
-See `docs/bww2abc_original.js` for the complete grace note table including strikes,
-grips, taorluaths, birls, throws, peles, cadences, and echo beats.
+The complete table (strikes, grips, taorluaths, birls, throws, peles, cadences,
+echo beats; about 200 tokens) is in [`bww_abc/grace_notes.py`](../bww_abc/grace_notes.py).
+It corrects two entries in Moine's original: `lgstd` is `{gdc}d` (not `{gec}`)
+and `lhstd` is `{dc}d` (not `{ed}`), both confirmed from the BMW manual.
+
+A gracenote group can never end on the pitch of the note it decorates (`{ed}d`
+or `{g}g` can't be played); abc2bww warns when one does.
 
 ---
 

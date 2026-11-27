@@ -1,6 +1,6 @@
 """Legacy (pre-Gold) BMW files. See docs/bmw_legacy_format.md."""
 
-from bmw2abc_converter import convert
+from bww_abc import convert
 
 GOLD = "Bagpipe Music Writer Gold:1.0\r\n"
 LEGACY_HDR = '"My Tune"\r\r\n"Slow Air"\r\r\n"Arr. A. Piper"\r\r\n""\r\r\n\r\r\n'

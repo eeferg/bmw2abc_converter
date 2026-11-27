@@ -1,5 +1,5 @@
-from bmw2abc_converter.abc_parse import parse_abc
-from bmw2abc_converter.bww_writer import write_bww
+from bww_abc.abc_parse import parse_abc
+from bww_abc.bww_writer import write_bww
 
 HDR = "X:1\nT:Barren Rocks\nR:March\nC:A. MacKellar\nM:2/4\nL:1/16\nK:HP\n"
 HDR8 = HDR.replace("L:1/16", "L:1/8")

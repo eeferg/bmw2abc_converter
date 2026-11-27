@@ -1,4 +1,4 @@
-from bmw2abc_converter import convert
+from bww_abc import convert
 
 BWW = ('Bagpipe Music Writer Gold:1.0\n'
        '"March",(T,L,0,0,Times New Roman,14,700,0,0,18,0,0,0)\n'

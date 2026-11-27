@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from bmw2abc_converter.abc2bww import convert_abc, main, output_names
+from bww_abc.abc2bww import convert_abc, main, output_names
 
 TUNE = "X:1\nT:Tune\nR:Reel\nM:C|\nL:1/8\nK:HP\nA2 B2 c2 d2|\n"
 

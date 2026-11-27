@@ -1,7 +1,7 @@
 """Round-trip tests over real tunes.
 
-- Fixtures (always run): Ed's ABC → abc2bww → bmw2abc → same notes.
-- LEE_BWW_DIR: Lee BWW → bmw2abc → abc2bww → bmw2abc → same notes.
+- Fixtures (always run): Ed's ABC → abc2bww → bww2abc → same notes.
+- LEE_BWW_DIR: Lee BWW → bww2abc → abc2bww → bww2abc → same notes.
 - LEE_BWW_DIR + NA_MARAGAN_DIR: Ed's ABC marked "B:Lee & Sons" → abc2bww must match
   Lee's original BWW note for note (pitch, duration, gracenotes).
 - NA_MARAGAN_DIR: whole-collection sweep, no exceptions.
@@ -18,12 +18,12 @@ from pathlib import Path
 
 import pytest
 
-from bmw2abc_converter import convert as bmw2abc
-from bmw2abc_converter.abc2bww import convert_abc
-from bmw2abc_converter.abc_model import Note
-from bmw2abc_converter.abc_parse import parse_abc
-from bmw2abc_converter.grace_notes import GRACE
-from bmw2abc_converter.grace_reverse import embellishment_tokens
+from bww_abc import convert as bww2abc
+from bww_abc.abc2bww import convert_abc
+from bww_abc.abc_model import Note
+from bww_abc.abc_parse import parse_abc
+from bww_abc.grace_notes import GRACE
+from bww_abc.grace_reverse import embellishment_tokens
 
 FIXTURES = sorted((Path(__file__).parent / "fixtures" / "abc").glob("*.abc"))
 LEE_DIR = Path(os.environ["LEE_BWW_DIR"]) if os.environ.get("LEE_BWW_DIR") else None
@@ -126,7 +126,7 @@ def _unit(abc_text: str) -> int:
 
 def _roundtrip_abc(abc_text: str) -> list[str]:
     unit = _unit(abc_text)
-    return [bmw2abc(bww, filename="rt.bww", unit=unit) for bww, _ in convert_abc(abc_text)]
+    return [bww2abc(bww, filename="rt.bww", unit=unit) for bww, _ in convert_abc(abc_text)]
 
 
 # -- fixtures ---------------------------------------------------------------
@@ -147,7 +147,7 @@ def test_fixture_roundtrip(path):
 def test_lee_roundtrip(path):
     if path.name in KNOWN_DIFFS:
         pytest.skip(KNOWN_DIFFS[path.name])
-    abc1 = bmw2abc(_read(path), filename=path.name)
+    abc1 = bww2abc(_read(path), filename=path.name)
     sig1 = note_signature(abc1)
     back = [note_signature(abc)[0] for abc in _roundtrip_abc(abc1)]
     assert len(back) == len(sig1)

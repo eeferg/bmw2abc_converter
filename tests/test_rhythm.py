@@ -1,6 +1,6 @@
 from fractions import Fraction as F
 
-from bmw2abc_converter.rhythm import PITCH_TO_BWW, PITCH_TO_DOT, bww_duration, nearest_duration
+from bww_abc.rhythm import PITCH_TO_BWW, PITCH_TO_DOT, bww_duration, nearest_duration
 
 
 def test_plain_durations():

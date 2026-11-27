@@ -101,7 +101,7 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
     legacy = not first_line.startswith("Bagpipe")
     legacy_kinds = iter("TYMF")
     out: list[str] = []
-    out.append(f"%abc-2.2\n% Converted from {filename} to ABC by bmw2abc_converter\n\nX:1")
+    out.append(f"%abc-2.2\n% Converted from {filename} to ABC by bww2abc\n\nX:1")
 
     key_acc = ""
     i = 0

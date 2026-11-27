@@ -7,9 +7,10 @@ from .converter import convert, convert_file, decode_text
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Convert Bagpipe Music Writer (.bww/.bmw) files to ABC notation"
+        prog="bww2abc",
+        description="Convert Bagpipe Music Writer (.bww, and legacy .bmw) files to ABC notation"
     )
-    parser.add_argument("input", nargs="?", help="Input BWW/BMW file (omit to read stdin)")
+    parser.add_argument("input", nargs="?", help="Input .bww or legacy .bmw file (omit to read stdin)")
     parser.add_argument("-o", "--output", help="Output ABC file (default: stdout)")
     parser.add_argument(
         "--hp",

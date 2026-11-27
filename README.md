@@ -1,193 +1,100 @@
-# bmw2abc_converter
+# bww-abc
 
-Convert Bagpipe Music Writer (`.bww` / `.bmw`) files to ABC music notation — and back.
+Convert bagpipe music between **Bagpipe Music Writer** (`.bww`) and **ABC**
+notation, in both directions.
 
-- `bmw2abc` — BWW → ABC
-- `abc2bww` — ABC → BWW (Bagpipe Music Writer Gold), for importing ABC tunes into
-  apps such as Braw Tunes that read BWW but not ABC
+- **`bww2abc`** — BWW → ABC, for typesetting with
+  [abcm2ps](https://github.com/lewdlime/abcm2ps) or editing as text. It also
+  reads legacy pre-Gold `.bmw` files.
+- **`abc2bww`** — ABC → BWW (Bagpipe Music Writer Gold), for opening ABC tunes
+  in BMW Gold or importing them into apps that read BWW but not ABC (such as
+  Braw Tunes).
 
-Python port of [bww2abc.js](http://moinejf.free.fr/bww2abc) by Jean-Francois Moine (GPL3+).
+Embellishments stay named on both sides: `{gef}e` ↔ `dbe`, `{Gdc}d` ↔ `thrd`,
+`{GdGe}A` ↔ `tar`. `bww2abc` is based on
+[bww2abc.js](http://moinejf.free.fr/bww2abc) by Jean-Francois Moine.
 
----
+## Install
 
-## Installation
-
-Requires Python 3.12+. Uses [uv](https://docs.astral.sh/uv/) for dependency management.
-
-### As an installable command (recommended)
-
-Install once and run `bmw2abc` from anywhere:
-
-```bash
-git clone https://github.com/eeferg/bmw2abc_converter
-cd bmw2abc_converter
-uv tool install .
-```
-
-After that, `bmw2abc` is available system-wide:
+Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
 
 ```bash
-bmw2abc tune.bww
-bmw2abc tune.bww -o tune.abc
-bmw2abc tune.bww --hp
+git clone https://github.com/eeferg/bww-abc
+cd bww-abc
+uv tool install .            # puts bww2abc and abc2bww on your PATH
+uv tool install . --reinstall   # after pulling updates
 ```
 
-To update after pulling new changes:
+To run from the source folder without installing, use `uv run bww2abc …`.
+
+## bww2abc (BWW → ABC)
 
 ```bash
-uv tool install . --reinstall
+bww2abc tune.bww                  # ABC to the screen
+bww2abc tune.bww -o tune.abc      # ABC to a file
+cat tune.bww | bww2abc            # read from a pipe
+bww2abc tune.bww --hp             # K:Hp (F# and C# drawn) instead of K:HP
+bww2abc tune.bww --unit 1/16      # L:1/16, for marches with 32nd-note detail
+bww2abc tune.bww --swap-title-type   # bagpipemusic.com files: title and type swapped
 ```
 
-### Run without installing
+| BWW | ABC |
+|---|---|
+| title / type / composer / footer | `T:` `R:` `C:` `%%footer` |
+| `TuneTempo,90` | `Q:1/4=90` |
+| notes, dots, beaming | `A2`, `A>B`, `A3/` … |
+| named embellishments | `{gef}` etc. |
+| repeats, 1st/2nd endings | `\|:` `:\|` `[1` `[2` `]` |
+| ties, triplets, rests | `-`, `(3`, `z` |
+| `"2nd Part"` labels | `% 2nd Part` |
 
-```bash
-git clone https://github.com/eeferg/bmw2abc_converter
-cd bmw2abc_converter
-uv sync
-```
+Accented text (Gaelic titles, for example) is preserved. Unknown tokens are
+reported as `*** 'xyz' not recognised ***` on stderr.
 
----
+## abc2bww (ABC → BWW)
 
-## Usage
-
-```bash
-# File to stdout
-bmw2abc tune.bww
-
-# File to file
-bmw2abc tune.bww -o tune.abc
-
-# From stdin
-cat tune.bww | bmw2abc
-
-# Use K:Hp key signature (shows F#/C# on staff) instead of default K:HP
-bmw2abc tune.bww --hp
-
-# Use L:1/16 unit note length (suits marches with 32nd-note detail)
-bmw2abc tune.bww --unit 1/16
-
-# bagpipemusic.com (Lee & Sons) files: put the title and tune type the right way round
-bmw2abc tune.bww --swap-title-type
-```
-
-If running without installing, prefix commands with `uv run python main.py` instead of `bmw2abc`.
-
-### Key signature options
-
-| Flag | ABC output | Effect |
-|------|-----------|--------|
-| *(default)* | `K:HP` | No key signature marks on staff (traditional piping style) |
-| `--hp` | `K:Hp` | F# and C# shown on staff |
-
-Non-standard accidentals (e.g. a naturalised High-G) are always emitted as `exp` modifiers regardless of flag.
-
-### Unit note length
-
-| Flag | ABC output | Best for |
-|------|-----------|---------|
-| *(default)* | `L:1/8` | Reels, jigs, strathspeys — 8th note as unit |
-| `--unit 1/16` | `L:1/16` | Marches and slow airs with 32nd-note detail |
-
-At `L:1/16`, dotted rhythms are written with `>` and `<` shorthands (`A>B`, `A<B`) rather than explicit fraction multipliers, which produces cleaner, more readable notation.
-
----
-
-## ABC → BWW (`abc2bww`)
-
-Converts pipe-tune ABC (the style written for abcm2ps with `K:HP`) to BWW files
-that open in Bagpipe Music Writer Gold.
+Written for pipe-tune ABC as typeset with abcm2ps (`K:HP` or `K:Hp`), not the
+full ABC standard.
 
 ```bash
 abc2bww tune.abc                      # → ./tune.bww
-abc2bww a.abc b.abc c.abc             # several at once, into the current folder
-abc2bww pipe_march/*.abc -o ~/bww/    # choose the output folder
+abc2bww a.abc b.abc -o ~/bww/         # several files, into a chosen folder
 abc2bww tune.abc --stdout             # print instead of writing
 abc2bww tune.abc --force              # overwrite an existing .bww
-abc2bww --all tunes/ -o bww_out/      # every ABC file in tunes/pipe_* folders
+abc2bww --all tunes/ -o bww_out/      # every .abc under tunes/pipe_* folders
 ```
 
-- A file with several `X:` tunes gives `name001.bww`, `name002.bww`, … (one
-  arrangement per file, as Braw Tunes requires), numbered like abcm2ps EPS files.
-- `T:` → title, `R:` → tune type, `C:` → composer, `Q:` → tempo (default 90).
-- Embellishments become named BWW tokens (`{Gdc}d` → `thrd`, `{gef}e` → `dbe`…).
-- Chord symbols, slurs, `%%` directives and harmony voices (`V:2`…) are dropped,
-  each with a warning. Every warning is printed under the file it came from.
-- Output uses Windows line endings and the BMW Gold 1.0 header.
+- A file holding several `X:` tunes gives `name001.bww`, `name002.bww` and so
+  on, one tune per file, numbered the way abcm2ps numbers EPS files.
+- `T:` → title, `R:` → tune type, `C:` → composer, `B:` → footer, `Q:` → tempo
+  (default 90).
+- Chord symbols, slurs and harmony voices (`V:2` and later) are dropped. Each
+  drop prints a warning under the file it came from, as do gracenote groups
+  that can't be played (`{ed}d`).
+- Output matches BMW Gold's own files: the Gold 1.0 header, Windows line
+  endings and the Windows-1252 character set.
 
----
-
-## ABC Output Format
-
-```abc
-%abc-2.2
-% Converted from tune.bww to ABC by bmw2abc_converter
-
-X:1
-T:Tune Title
-C:Composer
-R:Tune Type
-Q:1/4=80
-M:4/4
-L:1/8
-K:HP
-|: {g}A2{d}c2 ... :|
-```
-
-Grace notes appear in `{}` immediately before their principal note. Each barline token in the source flushes the current measure to a new output line.
-
----
-
-## What Gets Converted
-
-| BWW element | ABC output |
-|------------|-----------|
-| Title / Composer / Type / Footer | `T:` `C:` `R:` `%%footer` |
-| Tempo (`TuneTempo,90`) | `Q:1/4=90` |
-| Time signature | `M:3/4` etc. |
-| Notes with H/L prefix (High-G, Low-A…) | `g` `A` etc. |
-| Dotted notes (`'la`, `''f`) | `>` / `<` shorthands or duration multipliers (`A3/`, `f7//`) |
-| Grace note embellishments | `{gAd}` etc. — full table in `docs/bww_format.md` |
-| Repeat barlines | `|:` `:|` |
-| First/second endings (`'1`, `'2`, `_'`) | `[1` `[2` `["1 of 2"` `]` |
-| Ties (`^ts` / `^te`) | `-` after first note |
-| Rests (`REST_4`) | `z2` |
-| Tuplets (`^3s`) | `(3` |
-| Section labels (`"2nd Part"`) | `% 2nd Part` |
-| `space` tokens | silently ignored |
-
----
-
-## Reference Docs
+## Documentation
 
 | File | Contents |
-|------|---------|
-| [`docs/bww_format.md`](docs/bww_format.md) | Complete BWW token reference — notes, grace notes, barlines, time sigs, dots, tuplets |
-| [`docs/abc_bagpipe.md`](docs/abc_bagpipe.md) | ABC notation for bagpipes — pitches, durations, grace syntax, key sigs |
-| [`docs/bagpipe_notation_for_ai.md`](docs/bagpipe_notation_for_ai.md) | Bagpipe sheet music concepts for AI image recognition / LLM skills |
-| [`docs/bww2abc_original.js`](docs/bww2abc_original.js) | Original JS source (GPL3+) |
-| [`docs/musescore_bww_lexer.cpp`](docs/musescore_bww_lexer.cpp) | MuseScore C++ BWW lexer (secondary reference) |
+|---|---|
+| [docs/bww_format.md](docs/bww_format.md) | BWW Gold token reference: notes, dots, gracenotes, barlines, repeats, tuplets |
+| [docs/bmw_legacy_format.md](docs/bmw_legacy_format.md) | The older pre-Gold BMW format and how it differs |
+| [docs/abc_bagpipe.md](docs/abc_bagpipe.md) | ABC notation for bagpipes |
+| [docs/conversion_notes.md](docs/conversion_notes.md) | How the two converters map one format onto the other, and their known limits |
+| [docs/bagpipe_notation_for_ai.md](docs/bagpipe_notation_for_ai.md) | Reading bagpipe sheet music, for image-to-ABC work with AI models |
+| [docs/reference/](docs/reference/) | Moine's original `bww2abc.js` and MuseScore's BWW lexer |
 
----
-
-## Running Tests
+## Tests
 
 ```bash
-uv run pytest tests/ -v
+uv run pytest
 ```
 
----
-
-## Known Limitations / Future Work
-
-- Repeats with more than two endings may not render perfectly in all ABC players
-- Piobaireacd ornaments (not present in standard march/strathspey/reel repertoire) are not mapped
-- Multi-staff scores (e.g. harmonised pipe band scores) are not supported
-- bagpipemusic.com (Lee & Sons) BWW files store the tune type in the title field
-  and vice versa; use `bmw2abc --swap-title-type` for those files
-
----
+Tests that need private tune collections (`LEE_BWW_DIR`, `NA_MARAGAN_DIR`) are
+skipped when those aren't set.
 
 ## License
 
-Code: MIT.
-`docs/bww2abc_original.js` and derived grace-note tables: GPL3+ (Jean-Francois Moine).
+GPL-3.0-or-later. `bww2abc` is a port of Jean-Francois Moine's `bww2abc.js`
+(GPL3+), and the gracenote tables derive from it.

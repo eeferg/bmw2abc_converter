@@ -1,7 +1,7 @@
 from fractions import Fraction as F
 
-from bmw2abc_converter.abc_model import Bar, Note
-from bmw2abc_converter.abc_parse import parse_abc
+from bww_abc.abc_model import Bar, Note
+from bww_abc.abc_parse import parse_abc
 
 HDR = "X:1\nT:Test Tune\nT:Second Title\nR:March\nC:Trad\nM:2/4\nL:1/8\nK:HP\n"
 
@@ -106,7 +106,7 @@ def test_thick_repeat_variants_and_ending_close():
 
 def test_labelled_ending_n_of_m():
     items = parse_abc(HDR + '["2 of 2"A2 ] :|\n')[0].lines[0].items
-    assert items[0] == __import__("bmw2abc_converter.abc_model", fromlist=["Ending"]).Ending(22)
+    assert items[0] == __import__("bww_abc.abc_model", fromlist=["Ending"]).Ending(22)
     assert not parse_abc(HDR + '["2 of 2"A2 ] :|\n')[0].warnings
 
 

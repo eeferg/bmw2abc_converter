@@ -1,6 +1,6 @@
-"""Build bmw2abc_converter/grace_prefs.py from a corpus of BWW files.
+"""Build bww_abc/grace_prefs.py from a corpus of BWW files.
 
-Usage: uv run python scripts/build_grace_prefs.py LEE_DIR > bmw2abc_converter/grace_prefs.py
+Usage: uv run python scripts/build_grace_prefs.py LEE_DIR > bww_abc/grace_prefs.py
 
 For each embellishment token followed by a melody note, counts
 (ABC grace string, ABC pitch of the note) -> BWW token, and writes the most
@@ -15,7 +15,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from bmw2abc_converter.grace_notes import GRACE  # noqa: E402
+from bww_abc.grace_notes import GRACE  # noqa: E402
 
 NOTE_RE = re.compile(r"(LG|LA|B|C|D|E|F|HG|HA)[rl]?_\d+$")
 BWW_TO_PITCH = {"LG": "G", "LA": "A", "B": "B", "C": "c", "D": "d",

@@ -1,21 +1,22 @@
 [project]
-name = "bmw2abc-converter"
+name = "bww-abc"
 version = "0.1.0"
-description = "Convert between Bagpipe Music Writer (.bww/.bmw) files and ABC music notation"
+description = "Convert between Bagpipe Music Writer (.bww) files and ABC music notation"
+license = "GPL-3.0-or-later"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
-bmw2abc = "bmw2abc_converter:main"
-abc2bww = "bmw2abc_converter.abc2bww:main"
+bww2abc = "bww_abc:main"
+abc2bww = "bww_abc.abc2bww:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["bmw2abc_converter"]
+packages = ["bww_abc"]
 
 [dependency-groups]
 dev = [

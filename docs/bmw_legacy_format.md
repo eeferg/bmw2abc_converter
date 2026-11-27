@@ -31,7 +31,7 @@ line.
   "Arranged by Dave Rickard"
   ""
   ```
-- bmw2abc turns these lines into `%` comments, so the ABC has no title.
+- bww2abc maps them by position to `T:`, `R:`, `C:` and `%%footer`.
 
 ### Clef line
 - `& 6_8` or `& c_` appears without `sharpf sharpc`. Later staves are often a
@@ -82,9 +82,9 @@ triplet end.
 - Gold files with a second `Bagpipe Music Writer Gold:1.0` header partway
   through (29 files): several tunes joined into one file.
 
-## What bmw2abc does with old-format files
+## How bww2abc handles old-format files
 
-The 2026-11-27 survey found these problems. bmw2abc only reads this format;
+The 2026-11-27 survey found these problems. bww2abc reads this format;
 abc2bww always writes Gold.
 
 | Problem | Severity | Status |

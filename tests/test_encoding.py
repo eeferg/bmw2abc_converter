@@ -3,9 +3,9 @@
 import io
 import sys
 
-from bmw2abc_converter import main as bmw2abc_main
-from bmw2abc_converter.abc2bww import convert_abc, main as abc2bww_main
-from bmw2abc_converter.converter import convert_file
+from bww_abc import main as bww2abc_main
+from bww_abc.abc2bww import convert_abc, main as abc2bww_main
+from bww_abc.converter import convert_file
 
 GAELIC = "Cabar Fèidh — Mòrag à Tìr nan Òg, Ùisdean"
 BWW = ('Bagpipe Music Writer Gold:1.0\r\n'
@@ -13,22 +13,22 @@ BWW = ('Bagpipe Music Writer Gold:1.0\r\n'
        '& sharpf sharpc 2_4 LA_4 !I\r\n')
 
 
-def test_bmw2abc_reads_windows_encoded_file(tmp_path):
+def test_bww2abc_reads_windows_encoded_file(tmp_path):
     f = tmp_path / "t.bww"
     f.write_bytes(BWW.encode("cp1252"))
     assert f"T:{GAELIC}" in convert_file(f)
 
 
-def test_bmw2abc_reads_utf8_file(tmp_path):
+def test_bww2abc_reads_utf8_file(tmp_path):
     f = tmp_path / "t.bww"
     f.write_bytes(BWW.encode("utf-8"))
     assert f"T:{GAELIC}" in convert_file(f)
 
 
-def test_bmw2abc_reads_windows_encoded_stdin(monkeypatch, capsys):
-    monkeypatch.setattr(sys, "argv", ["bmw2abc"])
+def test_bww2abc_reads_windows_encoded_stdin(monkeypatch, capsys):
+    monkeypatch.setattr(sys, "argv", ["bww2abc"])
     monkeypatch.setattr(sys, "stdin", io.TextIOWrapper(io.BytesIO(BWW.encode("cp1252")), encoding="utf-8"))
-    bmw2abc_main()
+    bww2abc_main()
     assert f"T:{GAELIC}" in capsys.readouterr().out
 
 

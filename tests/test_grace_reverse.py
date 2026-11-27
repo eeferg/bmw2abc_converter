@@ -1,8 +1,8 @@
 import pytest
 
-from bmw2abc_converter import convert
-from bmw2abc_converter.grace_notes import GRACE
-from bmw2abc_converter.grace_reverse import embellishment_tokens
+from bww_abc import convert
+from bww_abc.grace_notes import GRACE
+from bww_abc.grace_reverse import embellishment_tokens
 
 
 @pytest.mark.parametrize("grace,pitch,token", [
@@ -45,8 +45,8 @@ def test_light_g_strike_on_d_is_gdc():
     assert embellishment_tokens("gdc", "d") == (["lgstd"], None)
 
 
-def test_bmw2abc_renders_lgstd_as_gdc():
-    from bmw2abc_converter import convert
+def test_bww2abc_renders_lgstd_as_gdc():
+    from bww_abc import convert
     out = convert("& sharpf sharpc 2_4 lgstd D_4 !t\n")
     assert "{gdc}d" in out
 
