@@ -39,7 +39,6 @@ KNOWN_DIFFS: dict[str, str] = {
     "donald_macleans_farewell_to_oban_2_4.abc": "2nd ending: last {GAG}A 8th vs Lee quarter",
     "flowers_of_the_forest.abc": "Lee has a duplicated dot token ('d 'd) on a D; Ed single dot",
     "glendaurel_highlanders_6_8.abc": "2nd ending: Ed {GAG}A/ (16th) vs Lee dotted 8th",
-    "haughs_of_cromdale_2_4.abc": "2nd part: Ed {g}g (g-gracenote on high G) vs Lee {f}g",
     "meg_macrae_6_8.abc": "2nd ending: Ed {GdGe}B/ (16th) vs Lee dotted 8th",
     "newmarket_house.abc": "2nd part: Ed doubling {gef}e vs Lee single {g}e",
     "shepherds_crook.abc": "Ed starts with an extra C pickup; Lee's 'C' there is the common-time sign",

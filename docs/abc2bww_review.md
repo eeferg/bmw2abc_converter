@@ -38,7 +38,7 @@ fixed, so the test checks it again.
 - [ ] flowers_of_the_forest: Lee's file has a stray double dot token on a D (probably Lee's error)
 - [ ] glendaurel_highlanders_6_8: 2nd-ending pickup `{GAG}A/` is a 16th where Lee has a dotted 8th
 - [ ] meg_macrae_6_8: 2nd-ending pickup `{GdGe}B/` is a 16th where Lee has a dotted 8th
-- [ ] haughs_of_cromdale_2_4: 2nd part, `{g}g` where Lee has `{f}g`
+- [x] haughs_of_cromdale_2_4: fixed in the collection on 2026-11-27; it now matches Lee
 - [ ] newmarket_house: 2nd part, doubling `{gef}e` where Lee has a single `{g}e`
 - [ ] shepherds_crook: extra C pickup at the start (Lee's "C" there is the common-time sign)
 - [ ] thornton_jig_pipes: your setting adds 1st/2nd endings where Lee has a plain repeat
@@ -48,26 +48,11 @@ both Cabar Fèidh settings, and Farewell to the Creeks (reel).
 
 ## 4. Collection typos
 
-- [ ] `tail_toddle.abc` has a capital `D` twice. That's below the chanter's
-      range; it's converted as `d`.
-
-### Gracenote groups that end on the melody note's own pitch
-
-A group like `{ed}d` can't be played: nothing separates the last gracenote
-from the melody note. abc2bww now warns about these ("ends on the melody
-note"). The line numbers are from the 2026-11-27 copy of the collection.
-
-- [ ] pipe_hornpipe/crossing_the_minch.abc line 13: `{g}g`
-- [ ] pipe_march/father_eugenes_welcome_to_cape_north_2_4.abc line 12: `{g}g`
-- [ ] pipe_march/haughs_of_cromdale_2_4.abc lines 30, 31, 34: `{g}g` (Lee has `{f}g`; see section 3)
-- [ ] pipe_march/macleod_of_mull_6_8.abc line 15: `{gef}f` (`{gef}` is the doubling on E)
-- [ ] pipe_march/minstrel_boy_4_4.abc line 24: `{fg}g`
-- [ ] pipe_march/teribus_2_4.abc lines 10, 12: `{gf}f`
-- [ ] pipe_march/wagenborgen_4_4.abc lines 14, 16, 23: `{f}f`. This tune is also
-      a test fixture (`tests/fixtures/abc/`), so fix the copy there as well.
-- [ ] pipe_reel/kalabakan.abc line 11 (twice) and line 12: `{a}a`
-- [ ] pipe_strathspey/dalnahassaig.abc line 10: `{gf}f`. This tune is also a test
-      fixture, so fix the copy there as well.
+These are now tracked in the collection itself:
+`~/projects/eeferg/na_maragan_collection/abc_review.md`. It covers the
+gracenotes that end on the melody note, `tail_toddle`'s capital D, and the
+Lee-marked tunes that differ from Lee's files. Wagenborgen, Dalnahassaig and
+Haughs of Cromdale have been fixed, and their test fixtures recopied.
 
 ## 5. Decisions made while you were away
 
