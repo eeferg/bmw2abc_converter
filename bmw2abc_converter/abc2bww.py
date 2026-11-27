@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .abc_parse import parse_abc
 from .bww_writer import write_bww
+from .converter import decode_text
 
 # BMW Gold is a Windows program; write its files the way it does.
 BWW_ENCODING = "cp1252"
@@ -19,8 +20,19 @@ def convert_abc(text: str) -> list[tuple[str, list[str]]]:
     results = []
     for tune in parse_abc(text):
         bww = write_bww(tune)
-        results.append((bww, list(tune.warnings)))
+        warnings = list(tune.warnings)
+        if lost := sorted({ch for ch in bww if not _storable(ch)}):
+            warnings.append(f"BMW can't store {''.join(lost)!r}; written as '?'")
+        results.append((bww, warnings))
     return results
+
+
+def _storable(ch: str) -> bool:
+    try:
+        ch.encode(BWW_ENCODING)
+        return True
+    except UnicodeEncodeError:
+        return False
 
 
 def output_names(abc_path: Path, n_tunes: int) -> list[str]:
@@ -32,11 +44,7 @@ def output_names(abc_path: Path, n_tunes: int) -> list[str]:
 
 
 def _read_abc(path: Path) -> str:
-    data = path.read_bytes()
-    try:
-        return data.decode("utf-8")
-    except UnicodeDecodeError:
-        return data.decode("latin-1")
+    return decode_text(path.read_bytes())
 
 
 def _write_bww(path: Path, text: str) -> None:

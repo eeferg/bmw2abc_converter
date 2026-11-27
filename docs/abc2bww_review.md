@@ -84,7 +84,9 @@ Change any you disagree with.
 - Three notes tied in a row produce overlapping tie marks.
 - A staff that's only a final barline is skipped, so the tune ends on a plain
   barline instead of the final double bar.
-- Characters outside cp1252 become `?` without a warning.
+- ~~Characters outside cp1252 become `?` without a warning.~~ Fixed 2026-11-27:
+  abc2bww now warns. bmw2abc also reads Windows-encoded BWW files, so Gaelic
+  accents survive both directions.
 - `--stdout` output uses Unix line endings.
 - A part label inside a dropped harmony voice attaches to the melody.
 - Duration warnings name the staff but not the bar.

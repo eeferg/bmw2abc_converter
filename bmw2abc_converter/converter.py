@@ -423,10 +423,21 @@ def convert(bww_text: str, filename: str = "input.bww", key_type: str = "HP", un
     return result
 
 
+def decode_text(data: bytes) -> str:
+    """UTF-8 if it is valid, else Windows-1252 (what BMW Gold writes), so accents survive."""
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        try:
+            return data.decode("cp1252")
+        except UnicodeDecodeError:  # the 5 bytes cp1252 leaves undefined
+            return data.decode("latin-1")
+
+
 def convert_file(path: str | Path, key_type: str = "HP", unit: int = 8,
                  swap_title_type: bool = False) -> str:
     """Read a BWW file and return ABC notation as a string."""
     path = Path(path)
-    text = path.read_text(encoding="utf-8", errors="replace")
+    text = decode_text(path.read_bytes())
     return convert(text, filename=path.name, key_type=key_type, unit=unit,
                    swap_title_type=swap_title_type)

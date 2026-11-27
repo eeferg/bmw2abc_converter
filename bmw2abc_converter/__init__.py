@@ -2,7 +2,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from .converter import convert, convert_file
+from .converter import convert, convert_file, decode_text
 
 
 def main() -> None:
@@ -36,7 +36,7 @@ def main() -> None:
         abc = convert_file(args.input, key_type=key_type, unit=unit,
                            swap_title_type=args.swap_title_type)
     else:
-        bww_text = sys.stdin.read()
+        bww_text = decode_text(sys.stdin.buffer.read())
         abc = convert(bww_text, filename="stdin", key_type=key_type, unit=unit,
                       swap_title_type=args.swap_title_type)
 
