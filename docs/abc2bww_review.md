@@ -92,7 +92,6 @@ Change any you disagree with.
       purchased BWW files. A normal push doesn't send them, but
       `git push --mirror` would. Consider deleting them:
       `git for-each-ref refs/agents --format='%(refname)' | xargs -n1 git update-ref -d`
-- [ ] `scratch/` is untracked and isn't ignored, and it holds 7 `.bww` files.
-      Move it into `private/` if they came from Lee files.
+- [x] `scratch/` is now git-ignored.
 - [ ] Open a pull request for `abc2bww` when you're ready:
       https://github.com/eeferg/bmw2abc_converter/pull/new/abc2bww
